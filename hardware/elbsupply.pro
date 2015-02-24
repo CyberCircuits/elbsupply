@@ -1,4 +1,4 @@
-update=Di 24 Feb 2015 19:47:02 CET
+update=Di 24 Feb 2015 20:10:43 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -73,6 +73,6 @@ LibName28=atmel
 LibName29=contrib
 LibName30=valves
 LibName31=lib/ALPS-STEC12E08
-LibName32=lib/elbsupply-cache
-LibName33=lib/LM2576T-12
-LibName34=lib/lt3083
+LibName32=lib/LM2576T-12
+LibName33=lib/lt3083
+LibName34=lib/tps54331dda
