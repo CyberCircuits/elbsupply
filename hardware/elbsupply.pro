@@ -1,4 +1,4 @@
-update=Di 24 Feb 2015 20:10:43 CET
+update=Di 24 Feb 2015 22:31:47 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,6 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
-version=1
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
@@ -76,3 +74,5 @@ LibName31=lib/ALPS-STEC12E08
 LibName32=lib/LM2576T-12
 LibName33=lib/lt3083
 LibName34=lib/tps54331dda
+[general]
+version=1
