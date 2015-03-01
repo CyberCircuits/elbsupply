@@ -97,21 +97,10 @@ L R R?
 U 1 1 54E37C4D
 P 14700 8700
 F 0 "R?" V 14780 8700 50  0000 C CNN
-F 1 "6R8" V 14707 8701 50  0000 C CNN
+F 1 "220" V 14707 8701 50  0000 C CNN
 F 2 "" V 14630 8700 30  0000 C CNN
 F 3 "" H 14700 8700 30  0000 C CNN
 	1    14700 8700
-	0    -1   -1   0   
-$EndComp
-$Comp
-L +5V #PWR?
-U 1 1 54E37CA0
-P 14400 8700
-F 0 "#PWR?" H 14400 8550 60  0001 C CNN
-F 1 "+5V" H 14400 8840 60  0000 C CNN
-F 2 "" H 14400 8700 60  0000 C CNN
-F 3 "" H 14400 8700 60  0000 C CNN
-	1    14400 8700
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -697,7 +686,7 @@ $EndComp
 Text Notes 3600 2950 0    60   ~ 0
 Pre-regulator tracking control\nKeeps output voltage of TPS54331\nalways approx. 2V above LT3083\noutput voltage
 Text Notes 1600 900  0    60   ~ 0
-Tracking pre-regulator to minimize\npower dissipated in output pass transistor\nOutput voltage from 3V to 23V 
+Tracking pre-regulator to minimize\npower dissipated in output pass transistor\nOutput voltage from 2V to 22V 
 $Comp
 L LM358 U?
 U 1 1 54EABA27
@@ -822,69 +811,58 @@ $EndComp
 Text Notes 8550 2950 0    60   ~ 0
 CC mode comparator\npulls output control voltage to \nGND when current exceeds set maximum
 $Comp
-L LM7805CT U?
-U 1 1 54EA329A
-P 8550 9300
-F 0 "U?" H 8350 9500 40  0000 C CNN
-F 1 "uA7805" H 8550 9500 40  0000 L CNN
-F 2 "TO-220" H 8550 9400 30  0000 C CIN
-F 3 "" H 8550 9300 60  0000 C CNN
-	1    8550 9300
-	1    0    0    -1  
-$EndComp
-$Comp
 L C C?
 U 1 1 54EA352A
-P 8050 9550
-F 0 "C?" H 8100 9650 50  0000 L CNN
-F 1 "1uF" H 8100 9450 50  0000 L CNN
-F 2 "" H 8088 9400 30  0000 C CNN
-F 3 "" H 8050 9550 60  0000 C CNN
-	1    8050 9550
+P 7800 9050
+F 0 "C?" H 7850 9150 50  0000 L CNN
+F 1 "1uF" H 7850 8950 50  0000 L CNN
+F 2 "" H 7838 8900 30  0000 C CNN
+F 3 "" H 7800 9050 60  0000 C CNN
+	1    7800 9050
 	1    0    0    -1  
 $EndComp
 $Comp
 L C C?
 U 1 1 54EA3597
-P 9050 9550
-F 0 "C?" H 9100 9650 50  0000 L CNN
-F 1 "1uF" H 9100 9450 50  0000 L CNN
-F 2 "" H 9088 9400 30  0000 C CNN
-F 3 "" H 9050 9550 60  0000 C CNN
-	1    9050 9550
+P 9500 9050
+F 0 "C?" H 9550 9150 50  0000 L CNN
+F 1 "1uF" H 9550 8950 50  0000 L CNN
+F 2 "" H 9538 8900 30  0000 C CNN
+F 3 "" H 9500 9050 60  0000 C CNN
+	1    9500 9050
 	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR?
 U 1 1 54EA39E5
-P 8550 9900
-F 0 "#PWR?" H 8550 9650 60  0001 C CNN
-F 1 "GND" H 8550 9750 60  0000 C CNN
-F 2 "" H 8550 9900 60  0000 C CNN
-F 3 "" H 8550 9900 60  0000 C CNN
-	1    8550 9900
+P 7800 9450
+F 0 "#PWR?" H 7800 9200 60  0001 C CNN
+F 1 "GND" H 7800 9300 60  0000 C CNN
+F 2 "" H 7800 9450 60  0000 C CNN
+F 3 "" H 7800 9450 60  0000 C CNN
+	1    7800 9450
 	1    0    0    -1  
 $EndComp
 $Comp
 L +5V #PWR?
 U 1 1 54EA3FE5
-P 9050 9150
-F 0 "#PWR?" H 9050 9000 60  0001 C CNN
-F 1 "+5V" H 9050 9290 60  0000 C CNN
-F 2 "" H 9050 9150 60  0000 C CNN
-F 3 "" H 9050 9150 60  0000 C CNN
-	1    9050 9150
+P 9500 8750
+F 0 "#PWR?" H 9500 8600 60  0001 C CNN
+F 1 "+5V" H 9500 8890 60  0000 C CNN
+F 2 "" H 9500 8750 60  0000 C CNN
+F 3 "" H 9500 8750 60  0000 C CNN
+	1    9500 8750
 	1    0    0    -1  
 $EndComp
 $Comp
 L +24V #PWR?
 U 1 1 54EA4241
-P 8050 9150
-F 0 "#PWR?" H 8050 9000 60  0001 C CNN
-F 1 "+24V" H 8050 9290 60  0000 C CNN
-F 2 "" H 8050 9150 60  0000 C CNN
-F 3 "" H 8050 9150 60  0000 C CNN
-	1    8050 9150
+P 7800 8750
+F 0 "#PWR?" H 7800 8600 60  0001 C CNN
+F 1 "+24V" H 7800 8890 60  0000 C CNN
+F 2 "" H 7800 8750 60  0000 C CNN
+F 3 "" H 7800 8750 60  0000 C CNN
+	1    7800 8750
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1344,7 +1322,7 @@ F 3 "" H 10350 4450 60  0000 C CNN
 	1    10350 4450
 	1    0    0    -1  
 $EndComp
-Text Notes 8150 8900 0    60   ~ 0
+Text Notes 8300 8550 0    60   ~ 0
 5V digital supply\n
 $Comp
 L TVS D?
@@ -1854,28 +1832,6 @@ Wire Wire Line
 Wire Wire Line
 	6650 2450 7150 2450
 Wire Wire Line
-	8550 9550 8550 9900
-Wire Wire Line
-	9050 9750 9050 9850
-Connection ~ 8550 9850
-Wire Wire Line
-	8550 9800 8050 9800
-Wire Wire Line
-	8050 9800 8050 9750
-Connection ~ 8550 9800
-Wire Wire Line
-	8050 9150 8050 9350
-Wire Wire Line
-	8050 9250 8150 9250
-Wire Wire Line
-	9050 9150 9050 9350
-Connection ~ 9050 9250
-Connection ~ 8050 9250
-Wire Wire Line
-	8950 9250 9050 9250
-Wire Wire Line
-	9050 9850 8550 9850
-Wire Wire Line
 	11250 7200 11900 7200
 Wire Wire Line
 	11250 6900 11250 7350
@@ -2379,4 +2335,59 @@ Wire Wire Line
 	800  1250 1750 1250
 Connection ~ 1100 1250
 NoConn ~ 1750 1850
+$Comp
+L +24V #PWR?
+U 1 1 54F3C5A7
+P 14400 8700
+F 0 "#PWR?" H 14400 8550 60  0001 C CNN
+F 1 "+24V" H 14400 8840 60  0000 C CNN
+F 2 "" H 14400 8700 60  0000 C CNN
+F 3 "" H 14400 8700 60  0000 C CNN
+	1    14400 8700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L 7805MS U?
+U 1 1 54F3D9BD
+P 8650 9100
+F 0 "U?" H 8750 9500 70  0000 C CNN
+F 1 "TS78L05CS" H 8650 8700 70  0000 C CNN
+F 2 "" H 8650 9100 60  0000 C CNN
+F 3 "" H 8650 9100 60  0000 C CNN
+	1    8650 9100
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 54F3EB33
+P 9500 9450
+F 0 "#PWR?" H 9500 9200 60  0001 C CNN
+F 1 "GND" H 9500 9300 60  0000 C CNN
+F 2 "" H 9500 9450 60  0000 C CNN
+F 3 "" H 9500 9450 60  0000 C CNN
+	1    9500 9450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7800 8750 7800 8850
+Wire Wire Line
+	7800 8850 7950 8850
+Wire Wire Line
+	7800 9250 7800 9450
+Wire Wire Line
+	7800 9250 7950 9250
+Wire Wire Line
+	7800 9350 7950 9350
+Connection ~ 7800 9350
+Wire Wire Line
+	9350 9250 9500 9250
+Wire Wire Line
+	9500 9250 9500 9450
+Wire Wire Line
+	9350 9350 9500 9350
+Connection ~ 9500 9350
+Wire Wire Line
+	9350 8850 9500 8850
+Wire Wire Line
+	9500 8850 9500 8750
 $EndSCHEMATC
