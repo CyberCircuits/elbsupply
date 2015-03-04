@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = Di 03 Mär 2015 21:58:33 CET
+Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = Mi 04 Mär 2015 14:50:44 CET
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -249,14 +249,14 @@ BeginCmp
 TimeStamp = /54F668BE;
 Reference = P1;
 ValeurCmp = OUT_POS;
-IdModule  = ;
+IdModule  = devthrash_KICAD:SKS-PK10A;
 EndCmp
 
 BeginCmp
 TimeStamp = /54F6697F;
 Reference = P2;
 ValeurCmp = OUT_GND;
-IdModule  = ;
+IdModule  = devthrash_KICAD:SKS-PK10A;
 EndCmp
 
 BeginCmp
