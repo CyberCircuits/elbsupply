@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = Mi 04 Mär 2015 14:50:44 CET
+Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = Mi 04 Mär 2015 17:51:03 CET
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -260,6 +260,13 @@ IdModule  = devthrash_KICAD:SKS-PK10A;
 EndCmp
 
 BeginCmp
+TimeStamp = /54F749D9;
+Reference = P3;
+ValeurCmp = POWER_IN;
+IdModule  = Connect:bornier2;
+EndCmp
+
+BeginCmp
 TimeStamp = /54F49BBC;
 Reference = Q1;
 ValeurCmp = KST2907A;
@@ -368,7 +375,7 @@ BeginCmp
 TimeStamp = /54F1A4F0;
 Reference = R15;
 ValeurCmp = 0R1;
-IdModule  = Resistors_SMD:R_0603_HandSoldering;
+IdModule  = devthrash_KICAD:CRA2512-Bourns;
 EndCmp
 
 BeginCmp
