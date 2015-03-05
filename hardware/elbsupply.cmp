@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = Mi 04 Mär 2015 17:51:03 CET
+Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = Do 05 Mär 2015 09:06:10 CET
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -270,7 +270,7 @@ BeginCmp
 TimeStamp = /54F49BBC;
 Reference = Q1;
 ValeurCmp = KST2907A;
-IdModule  = Transistors_SMD:sot23;
+IdModule  = Housings_SOT-23_SOT-143_TSOT-6:SOT23_Handsoldering;
 EndCmp
 
 BeginCmp
