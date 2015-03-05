@@ -2410,4 +2410,12 @@ Wire Wire Line
 	1450 4200 1450 4250
 Wire Wire Line
 	1450 4250 1400 4250
+Text Label 4250 1400 0    60   ~ 0
+SMPS_OUT
+Text Label 2850 1400 0    60   ~ 0
+SMPS_SW
+Text Label 11850 1400 0    60   ~ 0
+LIN_OUT
+Text Label 7050 1400 0    60   ~ 0
+LIN_IN
 $EndSCHEMATC
