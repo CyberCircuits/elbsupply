@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = So 08 Mär 2015 10:49:00 CET
+Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = So 08 Mär 2015 14:49:23 CET
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -59,6 +59,20 @@ EndCmp
 BeginCmp
 TimeStamp = /54EE762C;
 Reference = C9;
+ValeurCmp = 10nF;
+IdModule  = Capacitors_SMD:C_0603_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = /54FC72C2;
+Reference = C10;
+ValeurCmp = 10nF;
+IdModule  = Capacitors_SMD:C_0603_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = /54FC72E1;
+Reference = C11;
 ValeurCmp = 10nF;
 IdModule  = Capacitors_SMD:C_0603_HandSoldering;
 EndCmp
@@ -435,6 +449,20 @@ IdModule  = Resistors_SMD:R_0603_HandSoldering;
 EndCmp
 
 BeginCmp
+TimeStamp = /54FC72CE;
+Reference = R24;
+ValeurCmp = 10k;
+IdModule  = Resistors_SMD:R_0603_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = /54FC72ED;
+Reference = R25;
+ValeurCmp = 10k;
+IdModule  = Resistors_SMD:R_0603_HandSoldering;
+EndCmp
+
+BeginCmp
 TimeStamp = /54F62C29;
 Reference = RP1;
 ValeurCmp = 10k;
@@ -487,6 +515,20 @@ BeginCmp
 TimeStamp = /54EE7626;
 Reference = SW2;
 ValeurCmp = SW_R;
+IdModule  = devthrash_KICAD:Button-SMT-standard;
+EndCmp
+
+BeginCmp
+TimeStamp = /54FC72BC;
+Reference = SW3;
+ValeurCmp = SW_OE;
+IdModule  = devthrash_KICAD:Button-SMT-standard;
+EndCmp
+
+BeginCmp
+TimeStamp = /54FC72DB;
+Reference = SW4;
+ValeurCmp = SW_MD;
 IdModule  = devthrash_KICAD:Button-SMT-standard;
 EndCmp
 
