@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = So 08 Mär 2015 14:49:23 CET
+Cmp-Mod V01 Created by Cvpcb (2015-02-28 BZR 5464)-product   date = So 08 Mär 2015 19:27:29 CET
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -463,6 +463,13 @@ IdModule  = Resistors_SMD:R_0603_HandSoldering;
 EndCmp
 
 BeginCmp
+TimeStamp = /54FCA896;
+Reference = R26;
+ValeurCmp = R;
+IdModule  = Resistors_SMD:R_0603_HandSoldering;
+EndCmp
+
+BeginCmp
 TimeStamp = /54F62C29;
 Reference = RP1;
 ValeurCmp = 10k;
@@ -572,6 +579,13 @@ TimeStamp = /54ECD673;
 Reference = U6;
 ValeurCmp = LT3083;
 IdModule  = Pentawatts:Pentawatt_Neutral_Staggered_Verical_TO220-5-T05D;
+EndCmp
+
+BeginCmp
+TimeStamp = /54FCA3D9;
+Reference = U7;
+ValeurCmp = LM334;
+IdModule  = devthrash_KICAD:SO8;
 EndCmp
 
 EndListe

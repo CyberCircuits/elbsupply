@@ -1,4 +1,4 @@
-update=Di 03 Mär 2015 16:53:22 CET
+update=So 08 Mär 2015 19:25:23 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -36,6 +36,8 @@ RptD_X=0
 RptD_Y=100
 RptLab=1
 LabSize=60
+[general]
+version=1
 [eeschema]
 version=1
 LibDir=
@@ -74,5 +76,4 @@ LibName31=lib/ALPS-STEC12E08
 LibName32=lib/LM2576T-12
 LibName33=lib/lt3083
 LibName34=lib/tps54331dda
-[general]
-version=1
+LibName35=lib/LM334
