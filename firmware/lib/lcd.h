@@ -20,4 +20,4 @@ void LCD_reset_display(void);
 void LCD_reset_cursor(void);
 void LCD_set_cursor(uint8_t line, uint8_t character);
 
-#endif // LCD_H
+#endif /* LCD_H */
