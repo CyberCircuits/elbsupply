@@ -34,7 +34,7 @@ uint16_t ADC_readPSUOutV(void)
 /* Reads the output current of the PSU
  * Returns scaled integer value of actual output current
  * of PSU 
- * i.e. return value is 1000*Iout, which is Iout in mA
+ * return value is 1000*Iout, i.e. Iout in mA
  */
 uint16_t ADC_readPSUOutI(void)
 {
