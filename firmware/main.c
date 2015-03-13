@@ -3,6 +3,7 @@
 
 #include "lcd.h"
 #include "adc.h"
+#include "pwm.h"
 
 /* I/O mapping on the PCB
  * 
@@ -32,7 +33,7 @@
 #define BTN_RIGHT	0x80
 #define ENC_BTN		0x04
 #define ENC_A		0x08
-#define ENC_BTN		0x10
+#define ENC_B		0x10
 #define BTN_MODE 	0x20
 #define BTN_OE		0x40
 
@@ -57,32 +58,6 @@ SM_STATE;
 // finite state machine registers
 volatile SM_STATE state_current;
 volatile SM_STATE state_next;
-
-void PWM_init(void)
-{	
-	// configure Timer 1
-	ICR1 = 19999;	// uper limit of Timer 1 count, yields resolution of 1 mV
-	OCR1A = 0;
-	OCR1B = 0;
-	TCCR1A = 0xA2; // fast non-inverting PWM mode
-	TCCR1B = 0x19; // prescaler 1
-	// configure I/O
-	DDRB |= (1<<PB2) | (1<<PB1);
-}
-
-/* sets the output voltage of the PSU
- * takes argument in mV */
-void PWM_setPSUOutV(uint16_t voltage)
-{
-	OCR1A = voltage * 10;
-}
-
-/* sets the output current limit of the PSU
- * takes argument in mA */
-void PWM_setPSUOutI(uint16_t current)
-{
-	OCR1B = (current<<2);
-}
 
 int main(void)
 {
