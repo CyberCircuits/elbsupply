@@ -121,13 +121,61 @@ int main(void)
 				break;
 				
 			case STATE_LCDUPDATE:
-				
+				// measure actual output voltage and current
 				voltageAdc = ADC_readPSUOutV();
 				currentAdc = ADC_readPSUOutI();
 				
+				// format output voltage reading 
+				displayBuffer[16] = (voltageAdc / 1000) + 48;
+				displayBuffer[17] = ((voltageAdc % 1000) / 100) + 48;
+				displayBuffer[19] = ((voltageAdc % 100) / 10) + 48;
+				displayBuffer[20] = (voltageAdc % 10) + 48;
+				
+				// format output current reading
+				displayBuffer[23] = (currentAdc / 1000) + 48;
+				displayBuffer[24] = ((currentAdc % 1000) / 100) + 48;
+				displayBuffer[25] = ((currentAdc % 100) / 10) + 48;
+				displayBuffer[26] = (currentAdc % 10) + 48;
+				
+				// format output voltage setting
+				displayBuffer[0] = (voltageSet / 1000) + 48;
+				displayBuffer[1] = ((voltageSet % 1000) / 100) + 48;
+				displayBuffer[3] = ((voltageSet % 100) / 10) + 48;
+				displayBuffer[4] = (voltageSet % 10) + 48;
+				
+				// format output current setting
+				displayBuffer[7] = (currentSet / 1000) + 48;
+				displayBuffer[8] = ((currentSet % 1000) / 100) + 48;
+				displayBuffer[9] = ((currentSet % 100) / 10) + 48;
+				displayBuffer[10] = (currentSet % 10) + 48;
+				
+				// display "OE" marker if output is enabled
+				if (psuOutEnabled == 1)
+				{
+					displayBuffer[30] = 'O';
+					displayBuffer[31] = 'E';
+				}
+				else
+				{
+					displayBuffer[30] = ' ';
+					displayBuffer[31] = ' ';
+				}
+				
+				// indicate wether PSU is in CC or CV mode
+				if (psuOutMode == 1)
+				{
+					displayBuffer[15] = 'C';
+				}
+				else
+				{
+					displayBuffer[15] = 'V';
+				}
+				
+				// push updated displayBuffer to LCD
 				LCD_setpos(0);
 				LCD_puts(displayBuffer);
 				
+				// return to idle state
 				stateNext = STATE_IDLE;
 				break;
 		}
