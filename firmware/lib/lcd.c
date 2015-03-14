@@ -120,20 +120,34 @@ void LCD_reset_cursor(void){
 void LCD_set_cursor(uint8_t line, uint8_t character){
 	uint8_t data = 0;
 	
-	if(line == 1){
-		data = 0x80 + 0x00 + character;
-		LCD_write(data);
+	switch(line)
+	{
+		case 0:
+			data = 0x80 + 0x00 + character;
+			LCD_write(data);
+			break;
+		
+		case 1:
+			data = 0x80 + 0x40 + character;
+			LCD_write(data);
+			break;
+		
+		case 2:
+			data = 0x80 + 0x10 + character;
+			LCD_write(data);
+			break;
+			
+		case 3:
+			data = 0x80 + 0x50 + character;
+			LCD_write(data);
+			break;
+			
+		default: break;
 	}
-	else if(line == 2){
-		data = 0x80 + 0x40 + character;
-		LCD_write(data);
-	}
-	else if(line == 3){
-		data = 0x80 + 0x10 + character;
-		LCD_write(data);
-	}
-	else{
-		data = 0x80 + 0x50 + character;
-		LCD_write(data);
-	}
+}
+
+/* Sets the cursor to the absolute position on the display */ 
+void LCD_setpos(uint8_t curpos)
+{	
+	LCD_set_cursor((curpos%16), curpos);
 }

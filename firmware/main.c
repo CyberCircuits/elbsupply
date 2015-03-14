@@ -37,11 +37,25 @@
 #define BTN_MODE 	0x20
 #define BTN_OE		0x40
 
-volatile uint8_t PINB_buffer;
-volatile uint8_t PIND_buffer;
+// IO register buffers. Index 1 is current reading, index 0 is last reading
+volatile uint8_t PINBBuffer[2] = {0xFF, 0xFF};
+volatile uint8_t PINDBuffer[2] = {0xFF, 0xFF};
+
+// variables for LCD
+char displayBuffer[32] = {"00.00V 0000mA CV00.00V 0000mA   "};
+uint8_t displayCurpos = 0;	// cursor position inside the display buffer
+
+// voltage/current set points and actual measurements
+uint16_t voltageSet, voltageAdc = 0;
+uint16_t currentSet, currentAdc = 0;
+
+// PSU output mode and status
+uint8_t psuOutEnabled = 0;		// 0 = output disabled, 1 = output enabled
+uint8_t psuOutMode = 0;			// 0 = constant voltage, 1 = constant current
 
 // define possible states of the finite state machine
-typedef enum{
+typedef enum
+{
 	STATE_IDLE,
 	STATE_CRIGHT,
 	STATE_CLEFT,
@@ -56,24 +70,18 @@ typedef enum{
 SM_STATE;
 
 // finite state machine registers
-volatile SM_STATE state_current;
-volatile SM_STATE state_next;
+SM_STATE stateCurrent, stateNext;
 
 int main(void)
 {
+	// low level initialization
 	LCD_init(0x28, 0x0C);	
-	
-	// display boot message
-	LCD_set_cursor(1,0);
-	LCD_puts(" ElbSupply v0.1 ");
-	LCD_set_cursor(2,0);
-	LCD_puts(" 2015 devthrash ");
-	
 	ADC_init();
 	PWM_init();
-	
-	state_current = STATE_IDLE;
-	state_next = STATE_IDLE;
+		
+	// initialize FSM registers
+	stateCurrent = STATE_IDLE;
+	stateNext = STATE_IDLE;
 	
 	// set up SysTick timer
 	// Timer 0
@@ -82,11 +90,62 @@ int main(void)
 	sei();
 	
 	while (1)
-	{
-
+	{	
+		switch (stateCurrent)
+		{
+			case STATE_IDLE:
+				break;
+				
+			case STATE_CRIGHT:
+				break;
+				
+			case STATE_CLEFT:
+				break;
+				
+			case STATE_ENCINC:
+				break;
+				
+			case STATE_ENCDEC:
+				break;
+				
+			case STATE_OE:
+				break;
+				
+			case STATE_CV:
+				break;
+				
+			case STATE_CC:
+				break;
+				
+			case STATE_PWMUPDATE:
+				break;
+				
+			case STATE_LCDUPDATE:
+				
+				voltageAdc = ADC_readPSUOutV();
+				currentAdc = ADC_readPSUOutI();
+				
+				LCD_setpos(0);
+				LCD_puts(displayBuffer);
+				
+				stateNext = STATE_IDLE;
+				break;
+		}
+		
+		stateCurrent = stateNext;
+		
 	}
 }
 
-ISR(TIMER0_OVF_vect){
+ISR(TIMER0_OVF_vect)
+{
+	// read IO input registers
+	PINBBuffer[1] = PINB;
+	PINDBuffer[1] = PIND;
 	
+	
+	
+	// save current IO input
+	PINBBuffer[0] = PINBBuffer[1];
+	PINDBuffer[0] = PINDBuffer[1];
 }

@@ -19,5 +19,6 @@ void LCD_puts(char *s);
 void LCD_reset_display(void);
 void LCD_reset_cursor(void);
 void LCD_set_cursor(uint8_t line, uint8_t character);
+void LCD_setpos(uint8_t curpos);
 
 #endif /* LCD_H */
