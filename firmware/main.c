@@ -46,8 +46,11 @@ char displayBuffer[32] = {"00.00V 0000mA CV00.00V 0000mA   "};
 uint8_t displayCurpos = 0;	// cursor position inside the display buffer
 
 // voltage/current set points and actual measurements
-uint16_t voltageSet, voltageAdc = 0;
-uint16_t currentSet, currentAdc = 0;
+// Adc = measured values
+// Set = set values input by the user
+// SetBuf = internal set buffer used fod updating the PWM
+uint16_t voltageSet, voltageSetBuf, voltageAdc = 0;
+uint16_t currentSet, currentSetBuf, currentAdc = 0;
 
 // PSU output mode and status
 uint8_t psuOutEnabled = 0;		// 0 = output disabled, 1 = output enabled
@@ -117,15 +120,51 @@ int main(void)
 				break;
 				
 			case STATE_OE:
+				// toggle output enable status bit
+				psuOutEnabled ^= 1; 
+					
+				// enable output	
+				if (psuOutEnabled == 1)
+				{
+					// constant current mode
+					if (psuOutMode == 1)
+					{
+						voltageSetBuf = 2000;
+					}
+					// constant voltage with current limiting mode
+					else
+					{
+						voltageSetBuf = voltageSet;
+					}
+					
+					currentSetBuf = currentSet;
+				}
+				// disable output
+				else 
+				{
+					voltageSetBuf = 0;
+					currentSetBuf = 0;
+				}
+			
+				stateNext = STATE_PWMUPDATE;
 				break;
 				
 			case STATE_CV:
+				// set internal output mode flag and disable output
+				psuOutMode = 0;
+				stateNext = STATE_OE;
 				break;
 				
 			case STATE_CC:
+				// set internal output mode flag and disable output
+				psuOutMode = 1;
+				stateNext = STATE_OE;
 				break;
 				
 			case STATE_PWMUPDATE:
+				PWM_setPSUOutV(voltageSetBuf);
+				PWM_setPSUOutI(currentSetBuf);
+				stateNext = STATE_LCDUPDATE;
 				break;
 				
 			case STATE_LCDUPDATE:
@@ -182,6 +221,7 @@ int main(void)
 				// push updated displayBuffer to LCD
 				LCD_setpos(0);
 				LCD_puts(displayBuffer);
+				LCD_setpos(displayCurpos);
 				
 				// return to idle state
 				stateNext = STATE_IDLE;

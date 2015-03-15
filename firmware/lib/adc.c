@@ -21,7 +21,7 @@ uint16_t ADC_readRaw(uint8_t channel)
 /* Reads the output voltage of the linear PSU section
  * Returns scaled integer value of actual output voltage
  * of PSU 
- * i.e. return value is 100*Vout
+ * i.e. return value is 100*Vout, e.g. 20V = 2000
  */
 uint16_t ADC_readPSUOutV(void)
 {
