@@ -79,6 +79,19 @@ SM_STATE;
 // finite state machine registers
 SM_STATE stateCurrent, stateNext;
 
+// each state of the FSM has it's own function
+// return value is the next state of the FSM
+SM_STATE stateIdle(void);
+SM_STATE stateCRight(void);
+SM_STATE stateCLeft(void);
+SM_STATE stateEncInc(void);
+SM_STATE stateEncDec(void);
+SM_STATE stateOE(void);
+SM_STATE stateCV(void);
+SM_STATE stateCC(void);
+SM_STATE statePWMUpdate(void);
+SM_STATE stateLCDUpdate(void);
+
 int main(void)
 {
 	// low level initialization
@@ -96,6 +109,7 @@ int main(void)
 	TCCR0 |= (1<<CS01); // prescaler 8, interrupt freq: 16MHz/(256*8) = 7.8125kHz
 	sei();
 	
+	// simply execute the FSM
 	while (1)
 	{	
 		switch (stateCurrent)
@@ -104,234 +118,43 @@ int main(void)
 				break;
 				
 			case STATE_CRIGHT:
-				// shift the display cursor right by one
-				displayCurpos++;
-				LCD_setpos(displayCurpos);
-				stateNext = STATE_IDLE;
+				stateNext = stateCRight();
 				break;
 				
 			case STATE_CLEFT:
-				// shift the display cursor left by one
-				displayCurpos--;
-				LCD_setpos(displayCurpos);
-				stateNext = STATE_IDLE;
+				stateNext = stateCLeft();
 				break;
 				
 			case STATE_ENCINC:
-				// increase output voltage or current depending on cursor position
-				switch(displayCurpos)
-				{
-					case 0: 
-						voltageSet += 1000;
-						break;
-					
-					case 1:
-						voltageSet += 100;
-						break;
-						
-					case 3:
-						voltageSet += 10;
-						break;
-						
-					case 4:
-						voltageSet += 1;
-						break;
-						
-					case 7:
-						currentSet += 1000;
-						break;
-						
-					case 8:
-						currentSet += 100;
-						break;
-						
-					case 9:
-						currentSet += 10;
-						break;
-						
-					case 10:
-						currentSet += 1;
-						break;
-				}
-				
-				// check wether the output is enabled
-				if (psuOutMode == 1)
-				{
-					// update internal set point buffers
-					voltageSetBuf = voltageSet;
-					currentSetBuf = currentSet;
-					// update PWM
-					stateNext= STATE_PWMUPDATE;
-				}
-				else
-				{
-					stateNext = STATE_IDLE;
-				}
+				stateNext = stateEncInc();
 				break;
 				
 			case STATE_ENCDEC:
-				// reduce output voltage or current depending on cursor position
-				switch(displayCurpos)
-				{
-					case 0: 
-						voltageSet -= 1000;
-						break;
-					
-					case 1:
-						voltageSet -= 100;
-						break;
-						
-					case 3:
-						voltageSet -= 10;
-						break;
-						
-					case 4:
-						voltageSet -= 1;
-						break;
-						
-					case 7:
-						currentSet -= 1000;
-						break;
-						
-					case 8:
-						currentSet -= 100;
-						break;
-						
-					case 9:
-						currentSet -= 10;
-						break;
-						
-					case 10:
-						currentSet -= 1;
-						break;
-				}
-				
-				// check wether the output is enabled
-				if (psuOutMode == 1)
-				{
-					// update internal set point buffers
-					voltageSetBuf = voltageSet;
-					currentSetBuf = currentSet;
-					// update PWM
-					stateNext= STATE_PWMUPDATE;
-				}
-				else
-				{
-					stateNext = STATE_IDLE;
-				}
+				stateNext = stateEncDec();
 				break;
 				
 			case STATE_OE:
-				// toggle output enable status bit
-				psuOutEnabled ^= 1; 
-					
-				// enable output	
-				if (psuOutEnabled == 1)
-				{
-					// constant current mode
-					if (psuOutMode == OUTMODE_CC)
-					{
-						voltageSetBuf = 2000;
-					}
-					// constant voltage with current limiting mode
-					else
-					{
-						voltageSetBuf = voltageSet;
-					}
-					
-					currentSetBuf = currentSet;
-				}
-				// disable output
-				else 
-				{
-					voltageSetBuf = 0;
-					currentSetBuf = 0;
-				}
-			
-				stateNext = STATE_PWMUPDATE;
+				stateNext = stateOE();
 				break;
 				
 			case STATE_CV:
-				// set internal output mode flag and disable output
-				psuOutMode = OUTMODE_CV;
-				stateNext = STATE_OE;
+				stateNext = stateCV();	
 				break;
 				
 			case STATE_CC:
-				// set internal output mode flag and disable output
-				psuOutMode = OUTMODE_CC;
-				stateNext = STATE_OE;
+				stateNext = stateCC();	
 				break;
 				
 			case STATE_PWMUPDATE:
-				PWM_setPSUOutV(voltageSetBuf);
-				PWM_setPSUOutI(currentSetBuf);
-				stateNext = STATE_LCDUPDATE;
+				stateNext = statePWMUpdate();
 				break;
 				
 			case STATE_LCDUPDATE:
-				// measure actual output voltage and current
-				voltageAdc = ADC_readPSUOutV();
-				currentAdc = ADC_readPSUOutI();
-				
-				// format output voltage reading 
-				displayBuffer[16] = (voltageAdc / 1000) + 48;
-				displayBuffer[17] = ((voltageAdc % 1000) / 100) + 48;
-				displayBuffer[19] = ((voltageAdc % 100) / 10) + 48;
-				displayBuffer[20] = (voltageAdc % 10) + 48;
-				
-				// format output current reading
-				displayBuffer[23] = (currentAdc / 1000) + 48;
-				displayBuffer[24] = ((currentAdc % 1000) / 100) + 48;
-				displayBuffer[25] = ((currentAdc % 100) / 10) + 48;
-				displayBuffer[26] = (currentAdc % 10) + 48;
-				
-				// format output voltage setting
-				displayBuffer[0] = (voltageSet / 1000) + 48;
-				displayBuffer[1] = ((voltageSet % 1000) / 100) + 48;
-				displayBuffer[3] = ((voltageSet % 100) / 10) + 48;
-				displayBuffer[4] = (voltageSet % 10) + 48;
-				
-				// format output current setting
-				displayBuffer[7] = (currentSet / 1000) + 48;
-				displayBuffer[8] = ((currentSet % 1000) / 100) + 48;
-				displayBuffer[9] = ((currentSet % 100) / 10) + 48;
-				displayBuffer[10] = (currentSet % 10) + 48;
-				
-				// display "OE" marker if output is enabled
-				if (psuOutEnabled == 1)
-				{
-					displayBuffer[30] = 'O';
-					displayBuffer[31] = 'E';
-				}
-				else
-				{
-					displayBuffer[30] = ' ';
-					displayBuffer[31] = ' ';
-				}
-				
-				// indicate wether PSU is in CC or CV mode
-				if (psuOutMode == OUTMODE_CC)
-				{
-					displayBuffer[15] = 'C';
-				}
-				else
-				{
-					displayBuffer[15] = 'V';
-				}
-				
-				// push updated displayBuffer to LCD
-				LCD_setpos(0);
-				LCD_puts(displayBuffer);
-				LCD_setpos(displayCurpos);
-				
-				// return to idle state
-				stateNext = STATE_IDLE;
+				stateNext = stateLCDUpdate();
 				break;
 		}
 		
 		stateCurrent = stateNext;
-		
 	}
 }
 
@@ -346,4 +169,244 @@ ISR(TIMER0_OVF_vect)
 	// save current IO input
 	PINBBuffer[0] = PINBBuffer[1];
 	PINDBuffer[0] = PINDBuffer[1];
+}
+
+SM_STATE stateIdle(void)
+{
+	return STATE_IDLE;
+}
+
+SM_STATE stateCRight(void)
+{
+	// shift the display cursor right by one
+	displayCurpos++;
+	LCD_setpos(displayCurpos);
+	return STATE_IDLE;
+}
+
+SM_STATE stateCLeft(void)
+{
+	// shift the display cursor left by one
+	displayCurpos--;
+	LCD_setpos(displayCurpos);
+	return STATE_IDLE;
+}
+
+SM_STATE stateEncInc(void)
+{
+	// increase output voltage or current depending on cursor position
+	switch(displayCurpos)
+	{
+		case 0: 
+			voltageSet += 1000;
+			break;
+					
+		case 1:
+			voltageSet += 100;
+			break;
+						
+		case 3:
+			voltageSet += 10;
+			break;
+						
+		case 4:
+			voltageSet += 1;
+			break;
+						
+		case 7:
+			currentSet += 1000;
+			break;
+						
+		case 8:
+			currentSet += 100;
+			break;
+						
+		case 9:
+			currentSet += 10;
+			break;
+						
+		case 10:
+			currentSet += 1;
+			break;
+	}
+				
+	// check wether the output is enabled
+	if (psuOutMode == 1)
+	{
+		// update internal set point buffers
+		voltageSetBuf = voltageSet;
+		currentSetBuf = currentSet;
+		// update PWM
+		return STATE_PWMUPDATE;
+	}
+	else
+	{
+		return STATE_IDLE;
+	}
+}
+
+SM_STATE stateEncDec(void)
+{
+	// reduce output voltage or current depending on cursor position
+	switch(displayCurpos)
+	{
+		case 0: 
+			voltageSet -= 1000;
+			break;
+					
+		case 1:
+			voltageSet -= 100;
+			break;
+						
+		case 3:
+			voltageSet -= 10;
+			break;
+						
+		case 4:
+			voltageSet -= 1;
+			break;
+						
+		case 7:
+			currentSet -= 1000;
+			break;
+						
+		case 8:
+			currentSet -= 100;
+			break;
+						
+		case 9:
+			currentSet -= 10;
+			break;
+						
+		case 10:
+			currentSet -= 1;
+			break;
+	}
+	
+	// check wether the output is enabled
+	if (psuOutMode == 1)
+	{
+		// update internal set point buffers
+		voltageSetBuf = voltageSet;
+		currentSetBuf = currentSet;
+		// update PWM
+		return STATE_PWMUPDATE;
+	}
+	else
+	{
+		return STATE_IDLE;
+	}	
+}
+
+SM_STATE stateOE(void)
+{
+	// toggle output enable status bit
+	psuOutEnabled ^= 1; 
+					
+	// enable output	
+	if (psuOutEnabled == 1)
+	{
+		// constant current mode
+		if (psuOutMode == OUTMODE_CC)
+		{
+			voltageSetBuf = 2000;
+		}
+		// constant voltage with current limiting mode
+		else
+		{
+			voltageSetBuf = voltageSet;
+		}
+					
+		currentSetBuf = currentSet;
+	}
+	// disable output
+	else 
+	{
+		voltageSetBuf = 0;
+		currentSetBuf = 0;
+	}
+	
+	return STATE_PWMUPDATE;
+}
+
+SM_STATE stateCV(void)
+{
+	// set internal output mode flag and disable output
+	psuOutMode = OUTMODE_CV;
+	return STATE_OE;
+}
+
+SM_STATE stateCC(void)
+{
+	// set internal output mode flag and disable output
+	psuOutMode = OUTMODE_CC;
+	return STATE_OE;
+}
+
+
+SM_STATE statePWMUpdate(void)
+{
+	PWM_setPSUOutV(voltageSetBuf);
+	PWM_setPSUOutI(currentSetBuf);
+	return STATE_LCDUPDATE;
+}
+
+SM_STATE stateLCDUpdate(void)
+{
+	// measure actual output voltage and current
+	voltageAdc = ADC_readPSUOutV();
+	currentAdc = ADC_readPSUOutI();
+				
+	// format output voltage reading 
+	displayBuffer[16] = (voltageAdc / 1000) + 48;
+	displayBuffer[17] = ((voltageAdc % 1000) / 100) + 48;
+	displayBuffer[19] = ((voltageAdc % 100) / 10) + 48;
+	displayBuffer[20] = (voltageAdc % 10) + 48;
+				
+	// format output current reading
+	displayBuffer[23] = (currentAdc / 1000) + 48;
+	displayBuffer[24] = ((currentAdc % 1000) / 100) + 48;
+	displayBuffer[25] = ((currentAdc % 100) / 10) + 48;
+	displayBuffer[26] = (currentAdc % 10) + 48;
+				
+	// format output voltage setting
+	displayBuffer[0] = (voltageSet / 1000) + 48;
+	displayBuffer[1] = ((voltageSet % 1000) / 100) + 48;
+	displayBuffer[3] = ((voltageSet % 100) / 10) + 48;
+	displayBuffer[4] = (voltageSet % 10) + 48;
+				
+	// format output current setting
+	displayBuffer[7] = (currentSet / 1000) + 48;
+	displayBuffer[8] = ((currentSet % 1000) / 100) + 48;
+	displayBuffer[9] = ((currentSet % 100) / 10) + 48;
+	displayBuffer[10] = (currentSet % 10) + 48;
+				
+	// display "OE" marker if output is enabled
+	if (psuOutEnabled == 1)
+	{
+		displayBuffer[30] = 'O';
+		displayBuffer[31] = 'E';
+	}
+	else
+	{
+		displayBuffer[30] = ' ';
+		displayBuffer[31] = ' ';
+	}
+				
+	// indicate wether PSU is in CC or CV mode
+	if (psuOutMode == OUTMODE_CC)
+	{
+		displayBuffer[15] = 'C';
+	}
+	else
+	{
+		displayBuffer[15] = 'V';
+	}
+				
+	// push updated displayBuffer to LCD
+	LCD_setpos(0);
+	LCD_puts(displayBuffer);
+	LCD_setpos(displayCurpos);
+	
+	return STATE_IDLE;
 }
