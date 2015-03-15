@@ -52,7 +52,7 @@ uint8_t displayCurpos = 0;	// cursor position inside the display buffer
 // voltage/current set points and actual measurements
 // Adc = measured values
 // Set = set values input by the user
-// SetBuf = internal set buffer used fod updating the PWM
+// SetBuf = internal set buffer used for updating the PWM
 uint16_t voltageSet, voltageSetBuf, voltageAdc = 0;
 uint16_t currentSet, currentSetBuf, currentAdc = 0;
 
@@ -87,7 +87,7 @@ int main(void)
 	PWM_init();
 		
 	// initialize FSM registers
-	stateCurrent = STATE_IDLE;
+	stateCurrent = STATE_LCDUPDATE;
 	stateNext = STATE_IDLE;
 	
 	// set up SysTick timer
@@ -118,9 +118,107 @@ int main(void)
 				break;
 				
 			case STATE_ENCINC:
+				// increase output voltage or current depending on cursor position
+				switch(displayCurpos)
+				{
+					case 0: 
+						voltageSet += 1000;
+						break;
+					
+					case 1:
+						voltageSet += 100;
+						break;
+						
+					case 3:
+						voltageSet += 10;
+						break;
+						
+					case 4:
+						voltageSet += 1;
+						break;
+						
+					case 7:
+						currentSet += 1000;
+						break;
+						
+					case 8:
+						currentSet += 100;
+						break;
+						
+					case 9:
+						currentSet += 10;
+						break;
+						
+					case 10:
+						currentSet += 1;
+						break;
+				}
+				
+				// check wether the output is enabled
+				if (psuOutMode == 1)
+				{
+					// update internal set point buffers
+					voltageSetBuf = voltageSet;
+					currentSetBuf = currentSet;
+					// update PWM
+					stateNext= STATE_PWMUPDATE;
+				}
+				else
+				{
+					stateNext = STATE_IDLE;
+				}
 				break;
 				
 			case STATE_ENCDEC:
+				// reduce output voltage or current depending on cursor position
+				switch(displayCurpos)
+				{
+					case 0: 
+						voltageSet -= 1000;
+						break;
+					
+					case 1:
+						voltageSet -= 100;
+						break;
+						
+					case 3:
+						voltageSet -= 10;
+						break;
+						
+					case 4:
+						voltageSet -= 1;
+						break;
+						
+					case 7:
+						currentSet -= 1000;
+						break;
+						
+					case 8:
+						currentSet -= 100;
+						break;
+						
+					case 9:
+						currentSet -= 10;
+						break;
+						
+					case 10:
+						currentSet -= 1;
+						break;
+				}
+				
+				// check wether the output is enabled
+				if (psuOutMode == 1)
+				{
+					// update internal set point buffers
+					voltageSetBuf = voltageSet;
+					currentSetBuf = currentSet;
+					// update PWM
+					stateNext= STATE_PWMUPDATE;
+				}
+				else
+				{
+					stateNext = STATE_IDLE;
+				}
 				break;
 				
 			case STATE_OE:
