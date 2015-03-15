@@ -37,6 +37,10 @@
 #define BTN_MODE 	0x20
 #define BTN_OE		0x40
 
+// define some flags for easier readability 
+#define OUTMODE_CV 	0 
+#define OUTMODE_CC 	1
+
 // IO register buffers. Index 1 is current reading, index 0 is last reading
 volatile uint8_t PINBBuffer[2] = {0xFF, 0xFF};
 volatile uint8_t PINDBuffer[2] = {0xFF, 0xFF};
@@ -127,7 +131,7 @@ int main(void)
 				if (psuOutEnabled == 1)
 				{
 					// constant current mode
-					if (psuOutMode == 1)
+					if (psuOutMode == OUTMODE_CC)
 					{
 						voltageSetBuf = 2000;
 					}
@@ -151,13 +155,13 @@ int main(void)
 				
 			case STATE_CV:
 				// set internal output mode flag and disable output
-				psuOutMode = 0;
+				psuOutMode = OUTMODE_CV;
 				stateNext = STATE_OE;
 				break;
 				
 			case STATE_CC:
 				// set internal output mode flag and disable output
-				psuOutMode = 1;
+				psuOutMode = OUTMODE_CC;
 				stateNext = STATE_OE;
 				break;
 				
@@ -209,7 +213,7 @@ int main(void)
 				}
 				
 				// indicate wether PSU is in CC or CV mode
-				if (psuOutMode == 1)
+				if (psuOutMode == OUTMODE_CC)
 				{
 					displayBuffer[15] = 'C';
 				}
