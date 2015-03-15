@@ -97,9 +97,17 @@ int main(void)
 				break;
 				
 			case STATE_CRIGHT:
+				// shift the display cursor right by one
+				displayCurpos++;
+				LCD_setpos(displayCurpos);
+				stateNext = STATE_IDLE;
 				break;
 				
 			case STATE_CLEFT:
+				// shift the display cursor left by one
+				displayCurpos--;
+				LCD_setpos(displayCurpos);
+				stateNext = STATE_IDLE;
 				break;
 				
 			case STATE_ENCINC:
