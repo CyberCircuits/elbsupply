@@ -57,12 +57,13 @@ uint16_t voltageSet, voltageSetBuf, voltageAdc = 0;
 uint16_t currentSet, currentSetBuf, currentAdc = 0;
 
 // PSU output mode and status
-uint8_t psuOutEnabled = 0;		// 0 = output disabled, 1 = output enabled
-uint8_t psuOutMode = 0;			// 0 = constant voltage, 1 = constant current
+// 0 = output disabled, 1 = output enabled
+uint8_t psuOutEnabled = 0;		
+// 0 = constant voltage, 1 = constant current
+uint8_t psuOutMode = 0;			
 
 // define possible states of the finite state machine
-typedef enum
-{
+typedef enum{
 	STATE_IDLE,
 	STATE_CRIGHT,
 	STATE_CLEFT,
@@ -81,96 +82,6 @@ SM_STATE stateCurrent, stateNext;
 
 // each state of the FSM has it's own function
 // return value is the next state of the FSM
-SM_STATE stateIdle(void);
-SM_STATE stateCRight(void);
-SM_STATE stateCLeft(void);
-SM_STATE stateEncInc(void);
-SM_STATE stateEncDec(void);
-SM_STATE stateOE(void);
-SM_STATE stateCV(void);
-SM_STATE stateCC(void);
-SM_STATE statePWMUpdate(void);
-SM_STATE stateLCDUpdate(void);
-
-int main(void)
-{
-	// low level initialization
-	LCD_init(0x28, 0x0C);	
-	ADC_init();
-	PWM_init();
-		
-	// initialize FSM registers
-	stateCurrent = STATE_LCDUPDATE;
-	stateNext = STATE_IDLE;
-	
-	// set up SysTick timer
-	// Timer 0
-	TIMSK |= (1<<TOIE0);	// enable overflow interrupt
-	TCCR0 |= (1<<CS01); // prescaler 8, interrupt freq: 16MHz/(256*8) = 7.8125kHz
-	sei();
-	
-	// simply execute the FSM
-	while (1)
-	{	
-		switch (stateCurrent)
-		{
-			case STATE_IDLE:
-				break;
-				
-			case STATE_CRIGHT:
-				stateNext = stateCRight();
-				break;
-				
-			case STATE_CLEFT:
-				stateNext = stateCLeft();
-				break;
-				
-			case STATE_ENCINC:
-				stateNext = stateEncInc();
-				break;
-				
-			case STATE_ENCDEC:
-				stateNext = stateEncDec();
-				break;
-				
-			case STATE_OE:
-				stateNext = stateOE();
-				break;
-				
-			case STATE_CV:
-				stateNext = stateCV();	
-				break;
-				
-			case STATE_CC:
-				stateNext = stateCC();	
-				break;
-				
-			case STATE_PWMUPDATE:
-				stateNext = statePWMUpdate();
-				break;
-				
-			case STATE_LCDUPDATE:
-				stateNext = stateLCDUpdate();
-				break;
-		}
-		
-		stateCurrent = stateNext;
-	}
-}
-
-ISR(TIMER0_OVF_vect)
-{
-	// read IO input registers
-	PINBBuffer[1] = PINB;
-	PINDBuffer[1] = PIND;
-	
-	
-	
-	// save current IO input
-	PINBBuffer[0] = PINBBuffer[1];
-	PINDBuffer[0] = PINDBuffer[1];
-}
-
 SM_STATE stateIdle(void)
 {
 	return STATE_IDLE;
@@ -195,52 +106,48 @@ SM_STATE stateCLeft(void)
 SM_STATE stateEncInc(void)
 {
 	// increase output voltage or current depending on cursor position
-	switch(displayCurpos)
-	{
-		case 0: 
-			voltageSet += 1000;
-			break;
+	switch (displayCurpos){
+	case 0: 
+		voltageSet += 1000;
+		break;
 					
-		case 1:
-			voltageSet += 100;
-			break;
+	case 1:
+		voltageSet += 100;
+		break;
 						
-		case 3:
-			voltageSet += 10;
-			break;
+	case 3:
+		voltageSet += 10;
+		break;
 						
-		case 4:
-			voltageSet += 1;
-			break;
+	case 4:
+		voltageSet += 1;
+		break;
 						
-		case 7:
-			currentSet += 1000;
-			break;
+	case 7:
+		currentSet += 1000;
+		break;
 						
-		case 8:
-			currentSet += 100;
-			break;
+	case 8:
+		currentSet += 100;
+		break;
 						
-		case 9:
-			currentSet += 10;
-			break;
+	case 9:
+		currentSet += 10;
+		break;
 						
-		case 10:
-			currentSet += 1;
-			break;
+	case 10:
+		currentSet += 1;
+		break;
 	}
 				
 	// check wether the output is enabled
-	if (psuOutMode == 1)
-	{
+	if (psuOutMode == 1){
 		// update internal set point buffers
 		voltageSetBuf = voltageSet;
 		currentSetBuf = currentSet;
 		// update PWM
 		return STATE_PWMUPDATE;
-	}
-	else
-	{
+	} else {
 		return STATE_IDLE;
 	}
 }
@@ -248,52 +155,48 @@ SM_STATE stateEncInc(void)
 SM_STATE stateEncDec(void)
 {
 	// reduce output voltage or current depending on cursor position
-	switch(displayCurpos)
-	{
-		case 0: 
-			voltageSet -= 1000;
-			break;
+	switch (displayCurpos){
+	case 0: 
+		voltageSet -= 1000;
+		break;
 					
-		case 1:
-			voltageSet -= 100;
-			break;
+	case 1:
+		voltageSet -= 100;
+		break;
 						
-		case 3:
-			voltageSet -= 10;
-			break;
+	case 3:
+		voltageSet -= 10;
+		break;
 						
-		case 4:
-			voltageSet -= 1;
-			break;
+	case 4:
+		voltageSet -= 1;
+		break;
 						
-		case 7:
-			currentSet -= 1000;
-			break;
+	case 7:
+		currentSet -= 1000;
+		break;
 						
-		case 8:
-			currentSet -= 100;
-			break;
+	case 8:
+		currentSet -= 100;
+		break;
 						
-		case 9:
-			currentSet -= 10;
-			break;
-						
-		case 10:
-			currentSet -= 1;
-			break;
+	case 9:
+		currentSet -= 10;
+		break;
+					
+	case 10:
+		currentSet -= 1;
+		break;
 	}
 	
 	// check wether the output is enabled
-	if (psuOutMode == 1)
-	{
+	if (psuOutMode == 1){
 		// update internal set point buffers
 		voltageSetBuf = voltageSet;
 		currentSetBuf = currentSet;
 		// update PWM
 		return STATE_PWMUPDATE;
-	}
-	else
-	{
+	} else {
 		return STATE_IDLE;
 	}	
 }
@@ -304,24 +207,16 @@ SM_STATE stateOE(void)
 	psuOutEnabled ^= 1; 
 					
 	// enable output	
-	if (psuOutEnabled == 1)
-	{
+	if (psuOutEnabled == 1){
 		// constant current mode
-		if (psuOutMode == OUTMODE_CC)
-		{
+		if (psuOutMode == OUTMODE_CC){
 			voltageSetBuf = 2000;
-		}
-		// constant voltage with current limiting mode
-		else
-		{
+		} else { 						// constant voltage with current limiting mode
 			voltageSetBuf = voltageSet;
 		}
 					
 		currentSetBuf = currentSet;
-	}
-	// disable output
-	else 
-	{
+	} else { 							// disable output
 		voltageSetBuf = 0;
 		currentSetBuf = 0;
 	}
@@ -342,7 +237,6 @@ SM_STATE stateCC(void)
 	psuOutMode = OUTMODE_CC;
 	return STATE_OE;
 }
-
 
 SM_STATE statePWMUpdate(void)
 {
@@ -382,13 +276,10 @@ SM_STATE stateLCDUpdate(void)
 	displayBuffer[10] = (currentSet % 10) + 48;
 				
 	// display "OE" marker if output is enabled
-	if (psuOutEnabled == 1)
-	{
+	if (psuOutEnabled == 1){
 		displayBuffer[30] = 'O';
 		displayBuffer[31] = 'E';
-	}
-	else
-	{
+	} else {
 		displayBuffer[30] = ' ';
 		displayBuffer[31] = ' ';
 	}
@@ -397,9 +288,7 @@ SM_STATE stateLCDUpdate(void)
 	if (psuOutMode == OUTMODE_CC)
 	{
 		displayBuffer[15] = 'C';
-	}
-	else
-	{
+	} else {
 		displayBuffer[15] = 'V';
 	}
 				
@@ -410,3 +299,81 @@ SM_STATE stateLCDUpdate(void)
 	
 	return STATE_IDLE;
 }
+
+int main(void)
+{
+	// low level initialization
+	LCD_init(0x28, 0x0C);	
+	ADC_init();
+	PWM_init();
+		
+	// initialize FSM registers
+	stateCurrent = STATE_LCDUPDATE;
+	stateNext = STATE_IDLE;
+	
+	// set up SysTick timer
+	// Timer 0
+	TIMSK |= (1<<TOIE0);	// enable overflow interrupt
+	TCCR0 |= (1<<CS01); // prescaler 8, interrupt freq: 16MHz/(256*8) = 7.8125kHz
+	sei();
+	
+	// simply execute the FSM
+	while (1){	
+		switch (stateCurrent){
+		case STATE_IDLE:
+			break;
+				
+		case STATE_CRIGHT:
+			stateNext = stateCRight();
+			break;
+				
+		case STATE_CLEFT:
+			stateNext = stateCLeft();
+			break;
+				
+		case STATE_ENCINC:
+			stateNext = stateEncInc();
+			break;
+				
+		case STATE_ENCDEC:
+			stateNext = stateEncDec();
+			break;
+				
+		case STATE_OE:
+			stateNext = stateOE();
+			break;
+				
+		case STATE_CV:
+			stateNext = stateCV();	
+			break;
+				
+		case STATE_CC:
+			stateNext = stateCC();	
+			break;
+				
+		case STATE_PWMUPDATE:
+			stateNext = statePWMUpdate();
+			break;
+				
+		case STATE_LCDUPDATE:
+			stateNext = stateLCDUpdate();
+			break;
+		}
+		
+		stateCurrent = stateNext;
+	}
+}
+
+ISR(TIMER0_OVF_vect)
+{
+	// read IO input registers
+	PINBBuffer[1] = PINB;
+	PINDBuffer[1] = PIND;
+	
+	
+	
+	// save current IO input
+	PINBBuffer[0] = PINBBuffer[1];
+	PINDBuffer[0] = PINDBuffer[1];
+}
+
