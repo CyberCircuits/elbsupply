@@ -29,21 +29,17 @@
  * LCD_D6:					PC4
  * LCD_D7:					PC5
  */
+#define ENC_BTN		0x02
+#define ENC_A		0x04
+#define ENC_B		0x08
+#define BTN_MODE 	0x10
+#define BTN_OE		0x20
 #define BTN_LEFT	0x40
 #define BTN_RIGHT	0x80
-#define ENC_BTN		0x04
-#define ENC_A		0x08
-#define ENC_B		0x10
-#define BTN_MODE 	0x20
-#define BTN_OE		0x40
 
 // define some flags for easier readability 
 #define OUTMODE_CV 	0 
 #define OUTMODE_CC 	1
-
-// IO register buffers. Index 1 is current reading, index 0 is last reading
-volatile uint8_t PINBBuffer[2] = {0xFF, 0xFF};
-volatile uint8_t PINDBuffer[2] = {0xFF, 0xFF};
 
 // variables for LCD
 char displayBuffer[32] = {"00.00V 0000mA CV00.00V 0000mA   "};
@@ -61,6 +57,40 @@ uint16_t currentSet, currentSetBuf, currentAdc = 0;
 uint8_t psuOutEnabled = 0;		
 // 0 = constant voltage, 1 = constant current
 uint8_t psuOutMode = 0;			
+
+/* This approach to switch debouncing has been borrowed from Jack Ganssle
+ * See http://www.ganssle.com/debouncing-pt2.htm for detailed description
+ */
+// number of timer interrupts after which a switch is considered debounced
+#define SW_CHECKS 	10	
+//uint8_t swDebouncedState; 						// debounced state of the switches
+volatile uint8_t swStateBuf[SW_CHECKS] = {0}; 	// holds SW_CHECKS consecutive switch state readings
+volatile uint8_t swStateIndex = 0;				// array index for number of checks performed
+
+/* Reads the raw state of the port input registers and fuses them
+ * together into one byte to be used in the debouncing routine
+ * 
+ * The byte layout is as follows:
+ * Bit	7			6		 5		  4		    3 		2 		1
+ * BTN_RIGHT | BTN_LEFT | BTN_OE | BTN_MODE | ENC_B | ENC_A | ENC_BTN
+ */
+uint8_t getSwitchRaw(void)
+{
+	uint8_t pb,pd,tmp;
+	pb = (PINB & 0x0C);
+	pd = (PIND & 0x7C);
+	tmp = ~(pb | (pd>>1));	// invert read values because switches are active low
+	return tmp;
+}
+
+/* Returns debounced state of the switches */
+uint8_t getSwitchDebounced(void)
+{
+	uint8_t i,j;
+	j = 0xFF;
+	for (i = 0; i < SW_CHECKS; i++) j = j & swStateBuf[i];
+	return j;
+}
 
 // define possible states of the finite state machine
 typedef enum{
@@ -303,7 +333,7 @@ SM_STATE stateLCDUpdate(void)
 int main(void)
 {
 	// low level initialization
-	LCD_init(0x28, 0x0C);	
+	LCD_init(0x28, 0x0E);	
 	ADC_init();
 	PWM_init();
 		
@@ -314,7 +344,7 @@ int main(void)
 	// set up SysTick timer
 	// Timer 0
 	TIMSK |= (1<<TOIE0);	// enable overflow interrupt
-	TCCR0 |= (1<<CS01); // prescaler 8, interrupt freq: 16MHz/(256*8) = 7.8125kHz
+	TCCR0 |= (1<<CS01) | (1<<CS00); // prescaler 64, interrupt freq: 16MHz/(256*64) = 977Hz
 	sei();
 	
 	// simply execute the FSM
@@ -366,14 +396,9 @@ int main(void)
 
 ISR(TIMER0_OVF_vect)
 {
-	// read IO input registers
-	PINBBuffer[1] = PINB;
-	PINDBuffer[1] = PIND;
-	
-	
-	
-	// save current IO input
-	PINBBuffer[0] = PINBBuffer[1];
-	PINDBuffer[0] = PINDBuffer[1];
+	// acumulate SW_CHECKS number of samples of the switch states
+	swStateBuf[swStateIndex] = getSwitchRaw();
+	++swStateIndex;
+	if (swStateIndex >= SW_CHECKS) swStateIndex = 0;
 }
 
