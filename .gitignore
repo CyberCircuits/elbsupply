@@ -8,3 +8,31 @@
 *.o
 *.sym
 .dep
+
+# ignore Gerber prodcution outputs
+*.gbl
+*.gbo
+*.gbs
+*.gko
+*.gtl
+*.gto
+*.gts
+*.xln
+
+# ignore BOM and other files
+*.csv
+*.od
+*.gbl
+*.gbo
+*.gbs
+*.gko
+*.gtl
+*.gto
+*.gts
+*.xln
+
+# ignore BOM and other files
+*.csv
+*.ods
+*.zip
+*.xml
