@@ -44,6 +44,7 @@
 // variables for LCD
 char displayBuffer[32] = {"00.00V 0000mA CV00.00V 0000mA   "};
 uint8_t displayCurpos = 0;	// cursor position inside the display buffer
+volatile uint8_t adcResampleTimeout = 0;
 
 // voltage/current set points and actual measurements
 // Adc = measured values
@@ -104,8 +105,7 @@ typedef enum{
 	STATE_ENCINC,
 	STATE_ENCDEC,
 	STATE_OE,
-	STATE_CV,
-	STATE_CC,
+	STATE_MODE,
 	STATE_PWMUPDATE,
 	STATE_LCDUPDATE
 }
@@ -118,7 +118,27 @@ SM_STATE stateCurrent, stateNext;
 // return value is the next state of the FSM
 SM_STATE stateIdle(void)
 {
-	return STATE_IDLE;
+	uint8_t tmp;
+	
+	tmp = getSwitchDebounced();
+	
+	if (tmp & BTN_OE){
+		return STATE_OE;
+	} else if (tmp & BTN_MODE) {
+		return STATE_MODE;
+	} else if (tmp & BTN_LEFT) {
+		return STATE_CLEFT;
+	} else if (tmp & BTN_RIGHT) {
+		return STATE_CRIGHT;
+	} else if ( (tmp & ENC_A) && (swDebouncedState & ENC_B) ) {
+		return STATE_ENCINC;
+	} else if ( (tmp & ENC_A) && !(swDebouncedState & ENC_B) ) {
+		return STATE_ENCDEC;
+	} else if (adcResampleTimeout >= 50) {
+		return STATE_LCDUPDATE;
+	} else {
+		return STATE_IDLE;
+	}
 }
 
 SM_STATE stateCRight(void)
@@ -175,7 +195,7 @@ SM_STATE stateEncInc(void)
 	}
 				
 	// check wether the output is enabled
-	if (psuOutMode == 1){
+	if (psuOutEnabled == 1){
 		// update internal set point buffers
 		voltageSetBuf = voltageSet;
 		currentSetBuf = currentSet;
@@ -224,7 +244,7 @@ SM_STATE stateEncDec(void)
 	}
 	
 	// check wether the output is enabled
-	if (psuOutMode == 1){
+	if (psuOutEnabled == 1){
 		// update internal set point buffers
 		voltageSetBuf = voltageSet;
 		currentSetBuf = currentSet;
@@ -258,17 +278,10 @@ SM_STATE stateOE(void)
 	return STATE_PWMUPDATE;
 }
 
-SM_STATE stateCV(void)
+SM_STATE stateMode(void)
 {
-	// set internal output mode flag and disable output
-	psuOutMode = OUTMODE_CV;
-	return STATE_OE;
-}
-
-SM_STATE stateCC(void)
-{
-	// set internal output mode flag and disable output
-	psuOutMode = OUTMODE_CC;
+	// toggle internal output mode flag and disable output
+	psuOutMode ^= 1;
 	return STATE_OE;
 }
 
@@ -377,12 +390,8 @@ int main(void)
 			stateNext = stateOE();
 			break;
 				
-		case STATE_CV:
-			stateNext = stateCV();	
-			break;
-				
-		case STATE_CC:
-			stateNext = stateCC();	
+		case STATE_MODE:
+			stateNext = stateMode();	
 			break;
 				
 		case STATE_PWMUPDATE:
@@ -404,5 +413,6 @@ ISR(TIMER0_OVF_vect)
 	swStateBuf[swStateIndex] = getSwitchRaw();
 	++swStateIndex;
 	if (swStateIndex >= SW_CHECKS) swStateIndex = 0;
+	adcResampleTimeout++;
 }
 
