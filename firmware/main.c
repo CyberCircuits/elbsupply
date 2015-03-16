@@ -63,7 +63,7 @@ uint8_t psuOutMode = 0;
  */
 // number of timer interrupts after which a switch is considered debounced
 #define SW_CHECKS 	10	
-//uint8_t swDebouncedState; 						// debounced state of the switches
+uint8_t swDebouncedState; 						// debounced state of the switches
 volatile uint8_t swStateBuf[SW_CHECKS] = {0}; 	// holds SW_CHECKS consecutive switch state readings
 volatile uint8_t swStateIndex = 0;				// array index for number of checks performed
 
@@ -83,13 +83,17 @@ uint8_t getSwitchRaw(void)
 	return tmp;
 }
 
-/* Returns debounced state of the switches */
+/* Returns debounced state of the switches 
+ * Return bit values: 1 if switch has changed, 0 otherwise
+ */
 uint8_t getSwitchDebounced(void)
 {
-	uint8_t i,j;
+	uint8_t i,j,tmp;
 	j = 0xFF;
 	for (i = 0; i < SW_CHECKS; i++) j = j & swStateBuf[i];
-	return j;
+	tmp = swDebouncedState ^ j;
+	swDebouncedState = j;
+	return tmp;
 }
 
 // define possible states of the finite state machine
