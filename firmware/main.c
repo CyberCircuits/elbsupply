@@ -112,7 +112,7 @@ typedef enum{
 SM_STATE;
 
 // finite state machine registers
-SM_STATE stateCurrent, stateNext;
+SM_STATE stateNext;
 
 // each state of the FSM has it's own function
 // return value is the next state of the FSM
@@ -135,6 +135,7 @@ SM_STATE stateIdle(void)
 	} else if ( (tmp & ENC_A) && !(swDebouncedState & ENC_B) ) {
 		return STATE_ENCDEC;
 	} else if (adcResampleTimeout >= 50) {
+		adcResampleTimeout = 0;
 		return STATE_LCDUPDATE;
 	} else {
 		return STATE_IDLE;
@@ -355,8 +356,7 @@ int main(void)
 	PWM_init();
 		
 	// initialize FSM registers
-	stateCurrent = STATE_LCDUPDATE;
-	stateNext = STATE_IDLE;
+	stateNext = STATE_LCDUPDATE;
 	
 	// set up SysTick timer
 	// Timer 0
@@ -366,7 +366,7 @@ int main(void)
 	
 	// simply execute the FSM
 	while (1){	
-		switch (stateCurrent){
+		switch (stateNext){
 		case STATE_IDLE:
 			stateNext = stateIdle();
 			break;
@@ -403,8 +403,6 @@ int main(void)
 			stateNext = stateLCDUpdate();
 			break;
 		}
-		
-		stateCurrent = stateNext;
 	}
 }
 
