@@ -122,7 +122,7 @@ SM_STATE stateIdle(void)
 	
 	tmp = getSwitchDebounced();
 	
-	if (tmp & BTN_OE){
+	if (tmp & BTN_OE) {
 		return STATE_OE;
 	} else if (tmp & BTN_MODE) {
 		return STATE_MODE;
@@ -368,6 +368,7 @@ int main(void)
 	while (1){	
 		switch (stateCurrent){
 		case STATE_IDLE:
+			stateNext = stateIdle();
 			break;
 				
 		case STATE_CRIGHT:
