@@ -78,7 +78,7 @@ volatile uint8_t swStateIndex = 0;				// array index for number of checks perfor
 uint8_t getSwitchRaw(void)
 {
 	uint8_t pb,pd,tmp;
-	pb = (PINB & 0x0C);
+	pb = (PINB & 0xC0);
 	pd = (PIND & 0x7C);
 	tmp = ~(pb | (pd>>1));	// invert read values because switches are active low
 	return tmp;
@@ -412,6 +412,7 @@ ISR(TIMER0_OVF_vect)
 	swStateBuf[swStateIndex] = getSwitchRaw();
 	++swStateIndex;
 	if (swStateIndex >= SW_CHECKS) swStateIndex = 0;
+	// timeout counter for next ADC read/display update
 	adcResampleTimeout++;
 }
 
