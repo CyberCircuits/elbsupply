@@ -1,5 +1,7 @@
+#define F_CPU 8000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 
 #include "lcd.h"
 #include "adc.h"
@@ -42,7 +44,11 @@
 #define OUTMODE_CC 	1
 
 // variables for LCD
-char displayBuffer[32] = {"00.00V 0000mA CV00.00V 0000mA   "};
+char displayBuffer[2][16] = {
+	"00.00V 0000mA CV",
+	"00.00V 0000mA   "
+};
+
 uint8_t displayCurpos = 0;	// cursor position inside the display buffer
 volatile uint8_t adcResampleTimeout = 0;
 
@@ -300,49 +306,51 @@ SM_STATE stateLCDUpdate(void)
 	currentAdc = ADC_readPSUOutI();
 				
 	// format output voltage reading 
-	displayBuffer[16] = (voltageAdc / 1000) + 48;
-	displayBuffer[17] = ((voltageAdc % 1000) / 100) + 48;
-	displayBuffer[19] = ((voltageAdc % 100) / 10) + 48;
-	displayBuffer[20] = (voltageAdc % 10) + 48;
+	displayBuffer[1][0] = (voltageAdc / 1000) + 48;
+	displayBuffer[1][1] = ((voltageAdc % 1000) / 100) + 48;
+	displayBuffer[1][3] = ((voltageAdc % 100) / 10) + 48;
+	displayBuffer[1][4] = (voltageAdc % 10) + 48;
 				
 	// format output current reading
-	displayBuffer[23] = (currentAdc / 1000) + 48;
-	displayBuffer[24] = ((currentAdc % 1000) / 100) + 48;
-	displayBuffer[25] = ((currentAdc % 100) / 10) + 48;
-	displayBuffer[26] = (currentAdc % 10) + 48;
+	displayBuffer[1][7] = (currentAdc / 1000) + 48;
+	displayBuffer[1][8] = ((currentAdc % 1000) / 100) + 48;
+	displayBuffer[1][9] = ((currentAdc % 100) / 10) + 48;
+	displayBuffer[1][10] = (currentAdc % 10) + 48;
 				
 	// format output voltage setting
-	displayBuffer[0] = (voltageSet / 1000) + 48;
-	displayBuffer[1] = ((voltageSet % 1000) / 100) + 48;
-	displayBuffer[3] = ((voltageSet % 100) / 10) + 48;
-	displayBuffer[4] = (voltageSet % 10) + 48;
+	displayBuffer[0][0] = (voltageSet / 1000) + 48;
+	displayBuffer[0][1] = ((voltageSet % 1000) / 100) + 48;
+	displayBuffer[0][3] = ((voltageSet % 100) / 10) + 48;
+	displayBuffer[0][4] = (voltageSet % 10) + 48;
 				
 	// format output current setting
-	displayBuffer[7] = (currentSet / 1000) + 48;
-	displayBuffer[8] = ((currentSet % 1000) / 100) + 48;
-	displayBuffer[9] = ((currentSet % 100) / 10) + 48;
-	displayBuffer[10] = (currentSet % 10) + 48;
+	displayBuffer[0][7] = (currentSet / 1000) + 48;
+	displayBuffer[0][8] = ((currentSet % 1000) / 100) + 48;
+	displayBuffer[0][9] = ((currentSet % 100) / 10) + 48;
+	displayBuffer[0][10] = (currentSet % 10) + 48;
 				
 	// display "OE" marker if output is enabled
 	if (psuOutEnabled == 1){
-		displayBuffer[30] = 'O';
-		displayBuffer[31] = 'E';
+		displayBuffer[1][14] = 'O';
+		displayBuffer[1][15] = 'E';
 	} else {
-		displayBuffer[30] = ' ';
-		displayBuffer[31] = ' ';
+		displayBuffer[1][14] = ' ';
+		displayBuffer[1][15] = ' ';
 	}
 				
 	// indicate wether PSU is in CC or CV mode
 	if (psuOutMode == OUTMODE_CC)
 	{
-		displayBuffer[15] = 'C';
+		displayBuffer[0][15] = 'C';
 	} else {
-		displayBuffer[15] = 'V';
+		displayBuffer[0][15] = 'V';
 	}
 				
 	// push updated displayBuffer to LCD
 	LCD_setpos(0);
-	LCD_puts(displayBuffer);
+	LCD_puts(displayBuffer[0]);
+	LCD_setpos(16);
+	LCD_puts(displayBuffer[1]);
 	LCD_setpos(displayCurpos);
 	
 	return STATE_IDLE;
@@ -358,14 +366,23 @@ int main(void)
 	// initialize FSM registers
 	stateNext = STATE_LCDUPDATE;
 	
+	LCD_setpos(0);
+	LCD_puts(displayBuffer[0]);
+	LCD_setpos(16);
+	LCD_puts(displayBuffer[1]);
+	LCD_setpos(displayCurpos);
+	
 	// set up SysTick timer
 	// Timer 0
-	TIMSK |= (1<<TOIE0);	// enable overflow interrupt
-	TCCR0 |= (1<<CS01) | (1<<CS00); // prescaler 64, interrupt freq: 16MHz/(256*64) = 977Hz
-	sei();
+	//TIMSK |= (1<<TOIE0);	// enable overflow interrupt
+	//TCCR0 |= (1<<CS01) | (1<<CS00); // prescaler 64, interrupt freq: 16MHz/(256*64) = 977Hz
+	//sei();
 	
 	// simply execute the FSM
-	while (1){	
+	while (1){
+	//LCD_init(0x28, 0x0E);
+	//_delay_ms(100);
+	/*	
 		switch (stateNext){
 		case STATE_IDLE:
 			stateNext = stateIdle();
@@ -403,6 +420,7 @@ int main(void)
 			stateNext = stateLCDUpdate();
 			break;
 		}
+		*/
 	}
 }
 
