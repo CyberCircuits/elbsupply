@@ -1,5 +1,5 @@
 #ifndef F_CPU
-#define F_CPU 16000000UL
+#define F_CPU 8000000UL
 #endif
 
 #include <avr/io.h>
@@ -12,8 +12,8 @@ void LCD_init(uint8_t mode, uint8_t cursor){
 	LCD_CTRL_DDR |= (1<<LCD_E) | (1<<LCD_RS);
 	LCD_CTRL_PORT |= (1<<LCD_E) | (1<<LCD_RS); // set E high --> no data yet, set RS high --> input interpreted as data
 		
-	LCD_DATA_DDR |= 0x0F;
-	LCD_DATA_PORT &= ~(0x0F);
+	LCD_DATA_DDR |= (1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4);
+	LCD_DATA_PORT &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
 	
 	_delay_ms(30); // wait for LCD 
 
@@ -22,7 +22,7 @@ void LCD_init(uint8_t mode, uint8_t cursor){
 	LCD_CTRL_PORT &= ~(1<<LCD_RS); // set RS to low --> bytes interpreted as commands 
 	LCD_CTRL_PORT |= (1<<LCD_E);
 	
-	LCD_DATA_PORT = (1<<LCD_DB5) | (1<<LCD_DB4);
+	LCD_DATA_PORT |= (1<<LCD_DB5) | (1<<LCD_DB4);
 	
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
@@ -32,19 +32,19 @@ void LCD_init(uint8_t mode, uint8_t cursor){
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(64);
+	_delay_us(220);
 	
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(64);
+	_delay_us(220);
 	
 	LCD_DATA_PORT &= ~(1<<LCD_DB4);
 	
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(64);
+	_delay_us(220);
 	//###############################################
 	
 	
@@ -63,18 +63,28 @@ void LCD_init(uint8_t mode, uint8_t cursor){
 }
 
 void LCD_write(uint8_t data){
+	uint8_t tmp;
+	
 	LCD_CTRL_PORT &= ~(1<<LCD_RS); // set RS to low --> bytes interpreted as commands 
 	LCD_CTRL_PORT |= (1<<LCD_E);
 	
 	// send upper nibble
-	LCD_DATA_PORT = (data & 0xF0)>>4;
+	tmp = LCD_DATA_PORT;
+	tmp &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
+	tmp |= (data & 0xF0)>>2; // this is app specific!!!
+	
+	LCD_DATA_PORT = tmp;
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
 	_delay_us(220);
 	
 	// send lower nibble
-	LCD_DATA_PORT = (data & 0x0F);
+	tmp = LCD_DATA_PORT;
+	tmp &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
+	tmp |= (data & 0x0F)<<2; // this is app specific!!!
+	
+	LCD_DATA_PORT = tmp;
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
@@ -82,18 +92,28 @@ void LCD_write(uint8_t data){
 }
 
 void LCD_putc(char c){
+	uint8_t tmp;
+	
 	LCD_CTRL_PORT |= (1<<LCD_RS);
 	LCD_CTRL_PORT |= (1<<LCD_E);
 	
 	// send upper nibble
-	LCD_DATA_PORT = (c & 0xF0)>>4;
+	tmp = LCD_DATA_PORT;
+	tmp &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
+	tmp |= (c & 0xF0)>>2; // this is app specific!!!
+
+	LCD_DATA_PORT = tmp;
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
 	_delay_us(220);
 		
 	// send lower nibble
-	LCD_DATA_PORT = (c & 0x0F);
+	tmp = LCD_DATA_PORT;
+	tmp &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
+	tmp |= (c & 0x0F)<<2; // this is app specific!!!
+	
+	LCD_DATA_PORT = tmp;
 	LCD_CTRL_PORT &= ~(1<<LCD_E);
 	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
@@ -101,7 +121,7 @@ void LCD_putc(char c){
 }
 
 void LCD_puts(char *s){
-	while(*s != '\0'){
+	while(*s){
 		LCD_putc(*s);
 		s++;
 	}
@@ -149,5 +169,5 @@ void LCD_set_cursor(uint8_t line, uint8_t character){
 /* Sets the cursor to the absolute position on the display */ 
 void LCD_setpos(uint8_t curpos)
 {	
-	LCD_set_cursor((curpos%16), curpos);
+	LCD_set_cursor((curpos/16), (curpos%16));
 }
