@@ -66,7 +66,7 @@ void LCD_write(uint8_t data){
 	uint8_t tmp;
 	
 	LCD_CTRL_PORT &= ~(1<<LCD_RS); // set RS to low --> bytes interpreted as commands 
-	LCD_CTRL_PORT |= (1<<LCD_E);
+	//LCD_CTRL_PORT |= (1<<LCD_E);
 	
 	// send upper nibble
 	tmp = LCD_DATA_PORT;
@@ -74,10 +74,11 @@ void LCD_write(uint8_t data){
 	tmp |= (data & 0xF0)>>2; // this is app specific!!!
 	
 	LCD_DATA_PORT = tmp;
-	LCD_CTRL_PORT &= ~(1<<LCD_E);
-	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(220);
+	_delay_us(LCD_CLK_PERIOD);
+	LCD_CTRL_PORT &= ~(1<<LCD_E);
+	_delay_us(LCD_CLK_PERIOD);
+	
 	
 	// send lower nibble
 	tmp = LCD_DATA_PORT;
@@ -85,28 +86,31 @@ void LCD_write(uint8_t data){
 	tmp |= (data & 0x0F)<<2; // this is app specific!!!
 	
 	LCD_DATA_PORT = tmp;
-	LCD_CTRL_PORT &= ~(1<<LCD_E);
-	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(220);
+	_delay_us(LCD_CLK_PERIOD);
+	LCD_CTRL_PORT &= ~(1<<LCD_E);
+	_delay_us(LCD_CLK_PERIOD);
+	
+	LCD_DATA_PORT &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
 }
 
 void LCD_putc(char c){
 	uint8_t tmp;
 	
 	LCD_CTRL_PORT |= (1<<LCD_RS);
-	LCD_CTRL_PORT |= (1<<LCD_E);
+	//LCD_CTRL_PORT |= (1<<LCD_E);
 	
 	// send upper nibble
 	tmp = LCD_DATA_PORT;
 	tmp &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));
 	tmp |= (c & 0xF0)>>2; // this is app specific!!!
-
+	
 	LCD_DATA_PORT = tmp;
-	LCD_CTRL_PORT &= ~(1<<LCD_E);
-	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(220);
+	_delay_us(LCD_CLK_PERIOD);
+	LCD_CTRL_PORT &= ~(1<<LCD_E);
+	_delay_us(LCD_CLK_PERIOD);
+	
 		
 	// send lower nibble
 	tmp = LCD_DATA_PORT;
@@ -114,16 +118,18 @@ void LCD_putc(char c){
 	tmp |= (c & 0x0F)<<2; // this is app specific!!!
 	
 	LCD_DATA_PORT = tmp;
-	LCD_CTRL_PORT &= ~(1<<LCD_E);
-	_delay_us(220);
 	LCD_CTRL_PORT |= (1<<LCD_E);
-	_delay_us(220);
+	_delay_us(LCD_CLK_PERIOD);
+	LCD_CTRL_PORT &= ~(1<<LCD_E);
+	_delay_us(LCD_CLK_PERIOD);
+	
+	LCD_DATA_PORT &= ~((1<<LCD_DB7) | (1<<LCD_DB6) | (1<<LCD_DB5) | (1<<LCD_DB4));	
 }
 
 void LCD_puts(char *s){
-	while(*s){
-		LCD_putc(*s);
-		s++;
+	for (uint8_t i = 0; i < 16; i++)
+	{
+		LCD_putc(s[i]);
 	}
 }
 

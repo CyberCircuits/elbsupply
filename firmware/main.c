@@ -50,7 +50,7 @@ char displayBuffer[2][16] = {
 };
 
 uint8_t displayCurpos = 0;	// cursor position inside the display buffer
-volatile uint8_t adcResampleTimeout = 0;
+volatile uint16_t adcResampleTimeout = 0;
 
 // voltage/current set points and actual measurements
 // Adc = measured values
@@ -69,7 +69,7 @@ uint8_t psuOutMode = 0;
  * See http://www.ganssle.com/debouncing-pt2.htm for detailed description
  */
 // number of timer interrupts after which a switch is considered debounced
-#define SW_CHECKS 	10	
+#define SW_CHECKS 35	
 uint8_t swDebouncedState; 						// debounced state of the switches
 volatile uint8_t swStateBuf[SW_CHECKS] = {0}; 	// holds SW_CHECKS consecutive switch state readings
 volatile uint8_t swStateIndex = 0;				// array index for number of checks performed
@@ -91,7 +91,7 @@ uint8_t getSwitchRaw(void)
 }
 
 /* Returns debounced state of the switches 
- * Return bit values: 1 if switch has changed, 0 otherwise
+ * Return bit values: 1 if switch has changed, 0 otherwise 
  */
 uint8_t getSwitchDebounced(void)
 {
@@ -128,19 +128,19 @@ SM_STATE stateIdle(void)
 	
 	tmp = getSwitchDebounced();
 	
-	if (tmp & BTN_OE) {
+	if (swDebouncedState & BTN_OE) {
 		return STATE_OE;
-	} else if (tmp & BTN_MODE) {
+	} else if (swDebouncedState & BTN_MODE) {
 		return STATE_MODE;
-	} else if (tmp & BTN_LEFT) {
+	} else if (swDebouncedState & BTN_LEFT) {
 		return STATE_CLEFT;
-	} else if (tmp & BTN_RIGHT) {
+	} else if (swDebouncedState & BTN_RIGHT) {
 		return STATE_CRIGHT;
-	} else if ( (tmp & ENC_A) && (swDebouncedState & ENC_B) ) {
-		return STATE_ENCINC;
 	} else if ( (tmp & ENC_A) && !(swDebouncedState & ENC_B) ) {
+		return STATE_ENCINC;
+	} else if ( (tmp & ENC_A) && (swDebouncedState & ENC_B) ) {
 		return STATE_ENCDEC;
-	} else if (adcResampleTimeout >= 50) {
+	} else if (adcResampleTimeout >= 488) {
 		adcResampleTimeout = 0;
 		return STATE_LCDUPDATE;
 	} else {
@@ -304,7 +304,7 @@ SM_STATE stateLCDUpdate(void)
 	// measure actual output voltage and current
 	voltageAdc = ADC_readPSUOutV();
 	currentAdc = ADC_readPSUOutI();
-				
+	
 	// format output voltage reading 
 	displayBuffer[1][0] = (voltageAdc / 1000) + 48;
 	displayBuffer[1][1] = ((voltageAdc % 1000) / 100) + 48;
@@ -328,7 +328,7 @@ SM_STATE stateLCDUpdate(void)
 	displayBuffer[0][8] = ((currentSet % 1000) / 100) + 48;
 	displayBuffer[0][9] = ((currentSet % 100) / 10) + 48;
 	displayBuffer[0][10] = (currentSet % 10) + 48;
-				
+	
 	// display "OE" marker if output is enabled
 	if (psuOutEnabled == 1){
 		displayBuffer[1][14] = 'O';
@@ -345,13 +345,15 @@ SM_STATE stateLCDUpdate(void)
 	} else {
 		displayBuffer[0][15] = 'V';
 	}
-				
+	
+	cli();		
 	// push updated displayBuffer to LCD
-	LCD_setpos(0);
+	LCD_set_cursor(0, 0);
 	LCD_puts(displayBuffer[0]);
-	LCD_setpos(16);
+	LCD_set_cursor(1, 0);
 	LCD_puts(displayBuffer[1]);
 	LCD_setpos(displayCurpos);
+	sei();
 	
 	return STATE_IDLE;
 }
@@ -362,27 +364,28 @@ int main(void)
 	LCD_init(0x28, 0x0E);	
 	ADC_init();
 	PWM_init();
-		
+	
+	voltageSet = 500;
+	currentSet = 200;
+	
 	// initialize FSM registers
 	stateNext = STATE_LCDUPDATE;
-	
+	/*
 	LCD_setpos(0);
 	LCD_puts(displayBuffer[0]);
 	LCD_setpos(16);
 	LCD_puts(displayBuffer[1]);
 	LCD_setpos(displayCurpos);
-	
+	*/
 	// set up SysTick timer
 	// Timer 0
-	//TIMSK |= (1<<TOIE0);	// enable overflow interrupt
-	//TCCR0 |= (1<<CS01) | (1<<CS00); // prescaler 64, interrupt freq: 16MHz/(256*64) = 977Hz
-	//sei();
+	TIMSK |= (1<<TOIE0);	// enable overflow interrupt
+	TCCR0 |= (1<<CS01) | (1<<CS00); // prescaler 64, interrupt freq: 8MHz/(256*64) = 488Hz
+	sei();
 	
 	// simply execute the FSM
 	while (1){
-	//LCD_init(0x28, 0x0E);
-	//_delay_ms(100);
-	/*	
+		
 		switch (stateNext){
 		case STATE_IDLE:
 			stateNext = stateIdle();
@@ -420,7 +423,7 @@ int main(void)
 			stateNext = stateLCDUpdate();
 			break;
 		}
-		*/
+		
 	}
 }
 
