@@ -14,7 +14,7 @@ void PWM_init(void)
 }
 
 /* sets the output voltage of the PSU
- * takes argument in mV */
+ * takes argument in 10 mV */
 void PWM_setPSUOutV(uint16_t voltage)
 {
 	OCR1A = voltage * 10;

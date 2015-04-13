@@ -43,6 +43,10 @@
 #define OUTMODE_CV 	0 
 #define OUTMODE_CC 	1
 
+// cursor shift directions
+#define CURSHIFT_LEFT 0
+#define CURSHIFT_RIGHT 1
+
 // variables for LCD
 char displayBuffer[2][16] = {
 	"00.00V 0000mA CV",
@@ -69,7 +73,7 @@ uint8_t psuOutMode = 0;
  * See http://www.ganssle.com/debouncing-pt2.htm for detailed description
  */
 // number of timer interrupts after which a switch is considered debounced
-#define SW_CHECKS 35	
+#define SW_CHECKS 30
 uint8_t swDebouncedState; 						// debounced state of the switches
 volatile uint8_t swStateBuf[SW_CHECKS] = {0}; 	// holds SW_CHECKS consecutive switch state readings
 volatile uint8_t swStateIndex = 0;				// array index for number of checks performed
@@ -83,10 +87,10 @@ volatile uint8_t swStateIndex = 0;				// array index for number of checks perfor
  */
 uint8_t getSwitchRaw(void)
 {
-	uint8_t pb,pd,tmp;
+	uint8_t pb,pd, tmp;
 	pb = (PINB & 0xC0);
 	pd = (PIND & 0x7C);
-	tmp = ~(pb | (pd>>1));	// invert read values because switches are active low
+	tmp = (pb | (pd>>1)) ^ 0xFF;	// invert read values because switches are active low
 	return tmp;
 }
 
@@ -101,6 +105,111 @@ uint8_t getSwitchDebounced(void)
 	tmp = swDebouncedState ^ j;
 	swDebouncedState = j;
 	return tmp;
+}
+
+/* variables for encoder debouncing, uses the same approch as switch 
+ * debouncing but different debounce time threshold for higher 
+ * responsiveness
+ */
+uint8_t encRefLeft[5] = {0, 2, 3, 1, 0};
+uint8_t encRefRight[5] = {0, 1, 3, 2, 0};
+volatile uint8_t encTurnBuf[5];
+volatile uint8_t encTurnIndex = 0;
+
+int8_t getEncoderTurn(void)
+{
+	uint8_t i,j;
+	
+	j = 5;
+	for (i = 0; i < 5; i++)
+	{
+		if (encTurnBuf[i] == encRefRight[i]) j--;
+	}
+	
+	if (j == 0) return 1;
+	
+	j = 5;
+	for (i = 0; i < 5; i++)
+	{
+		if (encTurnBuf[i] == encRefLeft[i]) j--;
+	}
+	
+	if (j == 0) return -1;
+	
+	return 0;
+}
+
+/* shifts the cursor display position left or right depending on inc
+ * if inc = 1: shift right
+ * if inc = 0: shift left
+ * this function ensures that the cursor is only moved to a position
+ * of one of the digits of the set points on the LCD (cursor doesn't
+ * move to digits that can't be modified)
+ */
+void lcdShiftCursor(uint8_t inc)
+{
+	switch (displayCurpos)
+	{
+	case 0:
+		if (inc){ 
+			displayCurpos++;
+		} 
+		break;
+		
+	case 1:
+		if (inc){ 
+			displayCurpos += 2; 
+		} else { 
+			displayCurpos--;
+		}
+		break;
+		
+	case 3:
+		if (inc){ 
+			displayCurpos++;
+		} else {
+			displayCurpos -= 2;
+		}
+		break;
+		
+	case 4: 
+		if (inc){ 
+			displayCurpos += 3;
+		} else {
+			displayCurpos--;
+		}
+		break;
+	
+	case 7:
+		if (inc){ 
+			displayCurpos++;
+		} else { 
+			displayCurpos -= 3;
+		}
+		break;
+	
+	case 8:
+		if (inc){ 
+			displayCurpos++;
+		} else { 
+			displayCurpos--;
+		}
+		break;
+				
+	case 9:
+		if (inc){ 
+			displayCurpos++;
+		} else {
+			displayCurpos--;
+		}
+		break;
+						
+	case 10:
+		if (!inc){ 
+			displayCurpos--;
+		} 
+		break;
+	}
 }
 
 // define possible states of the finite state machine
@@ -125,22 +234,24 @@ SM_STATE stateNext;
 SM_STATE stateIdle(void)
 {
 	uint8_t tmp;
+	int8_t encState;
 	
 	tmp = getSwitchDebounced();
+	encState = getEncoderTurn();
 	
-	if (swDebouncedState & BTN_OE) {
+	if ( (swDebouncedState & BTN_OE) && (tmp & BTN_OE) ) {
 		return STATE_OE;
-	} else if (swDebouncedState & BTN_MODE) {
+	} else if ( (swDebouncedState & BTN_MODE) && (tmp & BTN_MODE)) {
 		return STATE_MODE;
-	} else if (swDebouncedState & BTN_LEFT) {
+	} else if ( (swDebouncedState & BTN_LEFT) && (tmp & BTN_LEFT) ) {
 		return STATE_CLEFT;
-	} else if (swDebouncedState & BTN_RIGHT) {
+	} else if ( (swDebouncedState & BTN_RIGHT) && (tmp & BTN_RIGHT) ) {
 		return STATE_CRIGHT;
-	} else if ( (tmp & ENC_A) && !(swDebouncedState & ENC_B) ) {
+	} else if ( encState == 1 ) {
 		return STATE_ENCINC;
-	} else if ( (tmp & ENC_A) && (swDebouncedState & ENC_B) ) {
+	} else if ( encState == -1 ) {
 		return STATE_ENCDEC;
-	} else if (adcResampleTimeout >= 488) {
+	} else if (adcResampleTimeout >= 244) {
 		adcResampleTimeout = 0;
 		return STATE_LCDUPDATE;
 	} else {
@@ -151,7 +262,7 @@ SM_STATE stateIdle(void)
 SM_STATE stateCRight(void)
 {
 	// shift the display cursor right by one
-	displayCurpos++;
+	lcdShiftCursor(CURSHIFT_RIGHT);
 	LCD_setpos(displayCurpos);
 	return STATE_IDLE;
 }
@@ -159,7 +270,7 @@ SM_STATE stateCRight(void)
 SM_STATE stateCLeft(void)
 {
 	// shift the display cursor left by one
-	displayCurpos--;
+	lcdShiftCursor(CURSHIFT_LEFT);
 	LCD_setpos(displayCurpos);
 	return STATE_IDLE;
 }
@@ -168,36 +279,36 @@ SM_STATE stateEncInc(void)
 {
 	// increase output voltage or current depending on cursor position
 	switch (displayCurpos){
-	case 0: 
-		voltageSet += 1000;
+	case 0:
+		if (voltageSet < 1001) voltageSet += 1000;
 		break;
 					
 	case 1:
-		voltageSet += 100;
+		if (voltageSet < 1901) voltageSet += 100;
 		break;
 						
 	case 3:
-		voltageSet += 10;
+		if (voltageSet < 1991) voltageSet += 10;
 		break;
 						
 	case 4:
-		voltageSet += 1;
+		if (voltageSet < 2000) voltageSet += 1;
 		break;
 						
 	case 7:
-		currentSet += 1000;
+		if (currentSet < 2001) currentSet += 1000;
 		break;
 						
 	case 8:
-		currentSet += 100;
+		if (currentSet < 2901) currentSet += 100;
 		break;
 						
 	case 9:
-		currentSet += 10;
+		if (currentSet < 2991) currentSet += 10;
 		break;
 						
 	case 10:
-		currentSet += 1;
+		if (currentSet < 2999) currentSet += 1;
 		break;
 	}
 				
@@ -209,7 +320,7 @@ SM_STATE stateEncInc(void)
 		// update PWM
 		return STATE_PWMUPDATE;
 	} else {
-		return STATE_IDLE;
+		return STATE_LCDUPDATE;
 	}
 }
 
@@ -218,35 +329,35 @@ SM_STATE stateEncDec(void)
 	// reduce output voltage or current depending on cursor position
 	switch (displayCurpos){
 	case 0: 
-		voltageSet -= 1000;
+		if (voltageSet > 999) voltageSet -= 1000;
 		break;
 					
 	case 1:
-		voltageSet -= 100;
+		if (voltageSet > 99) voltageSet -= 100;
 		break;
 						
 	case 3:
-		voltageSet -= 10;
+		if (voltageSet > 9) voltageSet -= 10;
 		break;
 						
 	case 4:
-		voltageSet -= 1;
+		if (voltageSet > 0) voltageSet -= 1;
 		break;
 						
 	case 7:
-		currentSet -= 1000;
+		if (currentSet > 999) currentSet -= 1000;
 		break;
 						
 	case 8:
-		currentSet -= 100;
+		if (currentSet > 99) currentSet -= 100;
 		break;
 						
 	case 9:
-		currentSet -= 10;
+		if (currentSet > 9) currentSet -= 10;
 		break;
 					
 	case 10:
-		currentSet -= 1;
+		if (currentSet > 0) currentSet -= 1;
 		break;
 	}
 	
@@ -258,7 +369,7 @@ SM_STATE stateEncDec(void)
 		// update PWM
 		return STATE_PWMUPDATE;
 	} else {
-		return STATE_IDLE;
+		return STATE_LCDUPDATE;
 	}	
 }
 
@@ -365,18 +476,21 @@ int main(void)
 	ADC_init();
 	PWM_init();
 	
+	// input switches
+	DDRB &= ~0xC0;
+	DDRD &= ~0x7C;
+	
 	voltageSet = 500;
-	currentSet = 200;
+	currentSet = 3000;
 	
 	// initialize FSM registers
 	stateNext = STATE_LCDUPDATE;
-	/*
-	LCD_setpos(0);
-	LCD_puts(displayBuffer[0]);
-	LCD_setpos(16);
-	LCD_puts(displayBuffer[1]);
-	LCD_setpos(displayCurpos);
-	*/
+
+	// configure external interrupts for encoder
+	// any logical change in the INT0/1 pins causes interrupt
+	MCUCR |= (1<<ISC10) | (1<<ISC00);
+	GICR |= (1<<INT1) | (1<<INT0);
+
 	// set up SysTick timer
 	// Timer 0
 	TIMSK |= (1<<TOIE0);	// enable overflow interrupt
@@ -433,7 +547,31 @@ ISR(TIMER0_OVF_vect)
 	swStateBuf[swStateIndex] = getSwitchRaw();
 	++swStateIndex;
 	if (swStateIndex >= SW_CHECKS) swStateIndex = 0;
+		
 	// timeout counter for next ADC read/display update
 	adcResampleTimeout++;
+}
+
+ISR(INT0_vect)
+{
+	if (PIND & 0x08)
+	{
+		encTurnBuf[encTurnIndex] = 2;
+	} else {
+		encTurnBuf[encTurnIndex] = 1;
+	}
+	++encTurnIndex;
+	if (encTurnIndex > 4) encTurnIndex = 0;
+}
+
+ISR(INT1_vect){
+	if (PIND & 0x04)
+	{
+		encTurnBuf[encTurnIndex] = 3;
+	} else {
+		encTurnBuf[encTurnIndex] = 0;
+	}
+	++encTurnIndex;
+	if (encTurnIndex > 4) encTurnIndex = 0;
 }
 
