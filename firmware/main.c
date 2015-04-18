@@ -382,7 +382,7 @@ SM_STATE stateOE(void)
 	if (psuOutEnabled == 1){
 		// constant current mode
 		if (psuOutMode == OUTMODE_CC){
-			voltageSetBuf = 2000;
+			voltageSetBuf = 1500;
 		} else { 						// constant voltage with current limiting mode
 			voltageSetBuf = voltageSet;
 		}
@@ -547,7 +547,7 @@ ISR(TIMER0_OVF_vect)
 	swStateBuf[swStateIndex] = getSwitchRaw();
 	++swStateIndex;
 	if (swStateIndex >= SW_CHECKS) swStateIndex = 0;
-		
+			
 	// timeout counter for next ADC read/display update
 	adcResampleTimeout++;
 }
