@@ -107,9 +107,13 @@ uint8_t getSwitchDebounced(void)
 	return tmp;
 }
 
-/* variables for encoder debouncing, uses the same approch as switch 
- * debouncing but different debounce time threshold for higher 
- * responsiveness
+/* variables for encoder decoding
+ * Encoder outputs are connected to external interrupt pins on 
+ * the AVR which generate interrupts on any level change.
+ *
+ * In the ISR patterns are generated which are compared to the
+ * reference patterns in order to determine which way the encoder
+ * was spun
  */
 uint8_t encRefLeft[5] = {0, 2, 3, 1, 0};
 uint8_t encRefRight[5] = {0, 1, 3, 2, 0};
@@ -119,7 +123,7 @@ volatile uint8_t encTurnIndex = 0;
 int8_t getEncoderTurn(void)
 {
 	uint8_t i,j;
-	
+	// check wether the pattern matches with being turned right
 	j = 5;
 	for (i = 0; i < 5; i++)
 	{
@@ -127,7 +131,7 @@ int8_t getEncoderTurn(void)
 	}
 	
 	if (j == 0) return 1;
-	
+	// check wether the pattern matches with being turend left
 	j = 5;
 	for (i = 0; i < 5; i++)
 	{
@@ -151,63 +155,41 @@ void lcdShiftCursor(uint8_t inc)
 	switch (displayCurpos)
 	{
 	case 0:
-		if (inc){ 
-			displayCurpos++;
-		} 
+		if (inc) displayCurpos++; 
 		break;
 		
 	case 1:
-		if (inc){ 
-			displayCurpos += 2; 
-		} else { 
-			displayCurpos--;
-		}
+		if (inc) displayCurpos += 2; 
+		else displayCurpos--;
 		break;
 		
 	case 3:
-		if (inc){ 
-			displayCurpos++;
-		} else {
-			displayCurpos -= 2;
-		}
+		if (inc) displayCurpos++;
+		else displayCurpos -= 2;
 		break;
 		
 	case 4: 
-		if (inc){ 
-			displayCurpos += 3;
-		} else {
-			displayCurpos--;
-		}
+		if (inc) displayCurpos += 3;
+		else displayCurpos--;
 		break;
 	
 	case 7:
-		if (inc){ 
-			displayCurpos++;
-		} else { 
-			displayCurpos -= 3;
-		}
+		if (inc) displayCurpos++;
+		else displayCurpos -= 3;
 		break;
 	
 	case 8:
-		if (inc){ 
-			displayCurpos++;
-		} else { 
-			displayCurpos--;
-		}
+		if (inc) displayCurpos++;
+		else displayCurpos--;
 		break;
 				
 	case 9:
-		if (inc){ 
-			displayCurpos++;
-		} else {
-			displayCurpos--;
-		}
+		if (inc) displayCurpos++;
+		else displayCurpos--;
 		break;
 						
 	case 10:
-		if (!inc){ 
-			displayCurpos--;
-		} 
+		if (!inc) displayCurpos--;
 		break;
 	}
 }
