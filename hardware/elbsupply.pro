@@ -1,4 +1,4 @@
-update=So 08 Mär 2015 19:25:23 CET
+update=Thu 23 Apr 2015 09:08:46 PM CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -77,3 +77,4 @@ LibName32=lib/LM2576T-12
 LibName33=lib/lt3083
 LibName34=lib/tps54331dda
 LibName35=lib/LM334
+LibName36=/home/devthrash/Documents/Projects/kilibs.pretty/symbols/devthrash
