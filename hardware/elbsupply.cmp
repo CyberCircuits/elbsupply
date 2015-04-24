@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-04-22 BZR 5621)-product   date = Thu 23 Apr 2015 09:12:50 PM CEST
+Cmp-Mod V01 Created by Cvpcb (2015-04-22 BZR 5621)-product   date = Fri 24 Apr 2015 05:05:36 PM CEST
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -263,21 +263,21 @@ BeginCmp
 TimeStamp = /54E37BF4;
 Reference = DS1;
 ValeurCmp = LCD-016N002L;
-IdModule  = devthrash_KICAD:LCD16X2;
+IdModule  = devthrash:LCD16X2;
 EndCmp
 
 BeginCmp
 TimeStamp = /54E3842C;
 Reference = ENC1;
 ValeurCmp = ALPS-STEC12E08;
-IdModule  = devthrash_KICAD:ALPS-STEC12E08;
+IdModule  = devthrash:ALPS-STEC12E08;
 EndCmp
 
 BeginCmp
 TimeStamp = /5538BDC4;
 Reference = HS1;
 ValeurCmp = HEATSINK V5640A;
-IdModule  = ;
+IdModule  = devthrash:Heatsink-V5640A;
 EndCmp
 
 BeginCmp
@@ -291,7 +291,7 @@ BeginCmp
 TimeStamp = /54ED7923;
 Reference = L1;
 ValeurCmp = 4,7uH;
-IdModule  = devthrash_KICAD:242418FPS-Fastron;
+IdModule  = devthrash:242418FPS-Fastron;
 EndCmp
 
 BeginCmp
@@ -305,14 +305,14 @@ BeginCmp
 TimeStamp = /54F668BE;
 Reference = P1;
 ValeurCmp = OUT_POS;
-IdModule  = devthrash_KICAD:SKS-PK10A;
+IdModule  = devthrash:SKS-PK10A;
 EndCmp
 
 BeginCmp
 TimeStamp = /54F6697F;
 Reference = P2;
 ValeurCmp = OUT_GND;
-IdModule  = devthrash_KICAD:SKS-PK10A;
+IdModule  = devthrash:SKS-PK10A;
 EndCmp
 
 BeginCmp
@@ -459,7 +459,7 @@ BeginCmp
 TimeStamp = /54F1A4F0;
 Reference = R15;
 ValeurCmp = 0R1;
-IdModule  = devthrash_KICAD:CRA2512-Bourns;
+IdModule  = devthrash:CRA2512-Bourns;
 EndCmp
 
 BeginCmp
@@ -564,119 +564,119 @@ BeginCmp
 TimeStamp = /54F62C29;
 Reference = RP1;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /54EF7504;
 Reference = RP2;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /54F62FA1;
 Reference = RP3;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /5538E9E3;
 Reference = RP4;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /54F614E4;
 Reference = RP5;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /5538923D;
 Reference = RP6;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /5538B864;
 Reference = RP7;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:YC164-Yageo;
+IdModule  = devthrash:YC164-Yageo-Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /54E38280;
 Reference = RV1;
 ValeurCmp = 10k;
-IdModule  = devthrash_KICAD:BITech-23B;
+IdModule  = devthrash:BITech-23B;
 EndCmp
 
 BeginCmp
 TimeStamp = /54EE6373;
 Reference = SW1;
 ValeurCmp = SW_L;
-IdModule  = devthrash_KICAD:Button-SMT-standard;
+IdModule  = devthrash:Button-SMT-standard;
 EndCmp
 
 BeginCmp
 TimeStamp = /54EE7626;
 Reference = SW2;
 ValeurCmp = SW_R;
-IdModule  = devthrash_KICAD:Button-SMT-standard;
+IdModule  = devthrash:Button-SMT-standard;
 EndCmp
 
 BeginCmp
 TimeStamp = /54FC72BC;
 Reference = SW3;
 ValeurCmp = SW_OE;
-IdModule  = devthrash_KICAD:Button-SMT-standard;
+IdModule  = devthrash:Button-SMT-standard;
 EndCmp
 
 BeginCmp
 TimeStamp = /54FC72DB;
 Reference = SW4;
 ValeurCmp = SW_MD;
-IdModule  = devthrash_KICAD:Button-SMT-standard;
+IdModule  = devthrash:Button-SMT-standard;
 EndCmp
 
 BeginCmp
 TimeStamp = /55362D48;
 Reference = U1;
 ValeurCmp = MC34063;
-IdModule  = devthrash_KICAD:SO8;
+IdModule  = devthrash:SO8;
 EndCmp
 
 BeginCmp
 TimeStamp = /54ED73B0;
 Reference = U2;
 ValeurCmp = TPS54331DDA;
-IdModule  = devthrash_KICAD:SO8-PowerPAD;
+IdModule  = devthrash:SO8-PowerPAD;
 EndCmp
 
 BeginCmp
 TimeStamp = /55380929;
 Reference = U3;
 ValeurCmp = LM324;
-IdModule  = devthrash_KICAD:SO8;
+IdModule  = devthrash:SO8;
 EndCmp
 
 BeginCmp
 TimeStamp = /553A35B1;
 Reference = U4;
 ValeurCmp = LM358;
-IdModule  = devthrash_KICAD:SO8;
+IdModule  = devthrash:SO8;
 EndCmp
 
 BeginCmp
 TimeStamp = /54F3D9BD;
 Reference = U5;
 ValeurCmp = TS78L05CS;
-IdModule  = devthrash_KICAD:SO8;
+IdModule  = devthrash:SO8;
 EndCmp
 
 BeginCmp
@@ -690,7 +690,7 @@ BeginCmp
 TimeStamp = /54FCA3D9;
 Reference = U7;
 ValeurCmp = LM334;
-IdModule  = devthrash_KICAD:SO8;
+IdModule  = devthrash:SO8;
 EndCmp
 
 EndListe
