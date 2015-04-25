@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2015-04-22 BZR 5621)-product   date = Fri 24 Apr 2015 05:05:36 PM CEST
+Cmp-Mod V01 Created by Cvpcb (2015-04-22 BZR 5621)-product   date = Sat 25 Apr 2015 10:00:14 AM CEST
 
 BeginCmp
 TimeStamp = /54EEAF3C;
@@ -326,14 +326,14 @@ BeginCmp
 TimeStamp = /54F49BBC;
 Reference = Q1;
 ValeurCmp = KST2907A;
-IdModule  = Housings_SOT-23_SOT-143_TSOT-6:SOT23_Handsoldering;
+IdModule  = Housings_SOT-23_SOT-143_TSOT-6:SOT-23_Handsoldering;
 EndCmp
 
 BeginCmp
 TimeStamp = /5537279E;
 Reference = Q2;
 ValeurCmp = KST2907A;
-IdModule  = Housings_SOT-23_SOT-143_TSOT-6:SOT23_Handsoldering;
+IdModule  = Housings_SOT-23_SOT-143_TSOT-6:SOT-23_Handsoldering;
 EndCmp
 
 BeginCmp
@@ -389,7 +389,7 @@ BeginCmp
 TimeStamp = /55363EED;
 Reference = R5;
 ValeurCmp = 1R;
-IdModule  = Resistors_SMD:R_0603_HandSoldering;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
 EndCmp
 
 BeginCmp
@@ -536,7 +536,7 @@ BeginCmp
 TimeStamp = /54FCA896;
 Reference = R26;
 ValeurCmp = 10R;
-IdModule  = Resistors_SMD:R_0603_HandSoldering;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
 EndCmp
 
 BeginCmp
@@ -662,7 +662,7 @@ BeginCmp
 TimeStamp = /55380929;
 Reference = U3;
 ValeurCmp = LM324;
-IdModule  = devthrash:SO8;
+IdModule  = devthrash:SO14;
 EndCmp
 
 BeginCmp
