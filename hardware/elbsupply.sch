@@ -662,7 +662,7 @@ F 1 "ILIM" H 11850 8900 50  0000 C CNN
 F 2 "LEDs:LED-0805" H 11850 9000 60  0001 C CNN
 F 3 "" H 11850 9000 60  0000 C CNN
 	1    11850 9000
-	0    1    1    0   
+	0    -1   -1   0   
 $EndComp
 $Comp
 L R R2
@@ -673,17 +673,6 @@ F 1 "1k" V 11857 8551 50  0000 C CNN
 F 2 "Resistors_SMD:R_0603_HandSoldering" V 11780 8550 30  0001 C CNN
 F 3 "" H 11850 8550 30  0000 C CNN
 	1    11850 8550
-	1    0    0    -1  
-$EndComp
-$Comp
-L +5V #PWR025
-U 1 1 54EE9B19
-P 11850 8350
-F 0 "#PWR025" H 11850 8200 60  0001 C CNN
-F 1 "+5V" H 11850 8490 60  0000 C CNN
-F 2 "" H 11850 8350 60  0000 C CNN
-F 3 "" H 11850 8350 60  0000 C CNN
-	1    11850 8350
 	1    0    0    -1  
 $EndComp
 Text Label 8200 3350 0    60   ~ 0
@@ -708,7 +697,7 @@ F 1 "POWER" H 12550 9000 50  0000 C CNN
 F 2 "LEDs:LED-0805" H 12550 9100 60  0001 C CNN
 F 3 "" H 12550 9100 60  0000 C CNN
 	1    12550 9100
-	0    1    1    0   
+	0    -1   -1   0   
 $EndComp
 $Comp
 L +5V #PWR026
@@ -1180,9 +1169,9 @@ F 3 "" H 13250 9450 60  0000 C CNN
 $EndComp
 Text Label 13550 9350 2    60   ~ 0
 SW_MD
-Text Label 8200 10200 2    60   ~ 0
-SW_MD
 Text Label 8200 10300 2    60   ~ 0
+SW_MD
+Text Label 8200 10200 2    60   ~ 0
 SW_OE
 $Comp
 L LM334 U7
@@ -2903,7 +2892,6 @@ Wire Wire Line
 Wire Wire Line
 	11450 2600 11500 2600
 NoConn ~ 12700 3450
-NoConn ~ 13100 3450
 Wire Wire Line
 	6850 1400 10800 1400
 Wire Wire Line
@@ -2979,4 +2967,28 @@ F 3 "" H 4250 5350 30  0000 C CNN
 $EndComp
 Wire Wire Line
 	4250 5200 4250 4750
+Text Label 2300 3700 0    60   ~ 0
+MC34_Coll
+Text Label 4300 4600 0    60   ~ 0
+MC34_Emit
+Wire Wire Line
+	13100 3450 13150 3450
+Wire Wire Line
+	13150 3450 13150 3350
+Connection ~ 13150 3350
+Text Label 9250 10700 0    60   ~ 0
+LED_CC
+Text Label 9250 10050 0    60   ~ 0
+LED_CS
+$Comp
+L VCC #PWR?
+U 1 1 554504BB
+P 11850 8350
+F 0 "#PWR?" H 11850 8200 50  0001 C CNN
+F 1 "VCC" H 11850 8500 50  0000 C CNN
+F 2 "" H 11850 8350 60  0000 C CNN
+F 3 "" H 11850 8350 60  0000 C CNN
+	1    11850 8350
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
