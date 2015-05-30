@@ -461,7 +461,11 @@ int main(void)
 	// input switches
 	DDRB &= ~0xC0;
 	DDRD &= ~0x7C;
-	
+		
+	// enable pull up resistors
+	PORTB |= 0xC0;
+	PORTD |= 0x7C;
+
 	voltageSet = 500;
 	currentSet = 3000;
 	
