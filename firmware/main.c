@@ -10,13 +10,13 @@
 /* I/O mapping on the PCB
  * 
  * Inputs:
- * Button Left: 			PB6
- * Button right: 			PB7
+ * Button Left: 			PD0
+ * Button right: 			PD1
  * Encoder button: 			PD2
  * Encoder A:				PD3
  * Encoder B:				PD4				
- * Button mode: 			PD5
- * Button output enable: 	PD6
+ * Button output enable: 	PD5
+ * Button mode: 			PD6
  * 
  * output voltage:			ADC6
  * output current:			ADC7
@@ -31,13 +31,13 @@
  * LCD_D6:					PC4
  * LCD_D7:					PC5
  */
-#define ENC_BTN		0x02
-#define ENC_A		0x04
-#define ENC_B		0x08
-#define BTN_MODE 	0x10
-#define BTN_OE		0x20
-#define BTN_LEFT	0x40
-#define BTN_RIGHT	0x80
+#define BTN_LEFT	0x01
+#define BTN_RIGHT	0x02
+#define ENC_BTN		0x04
+#define ENC_A		0x08
+#define ENC_B		0x10
+#define BTN_OE 		0x20
+#define BTN_MODE	0x40
 
 // define some flags for easier readability 
 #define OUTMODE_CV 	0 
@@ -82,15 +82,13 @@ volatile uint8_t swStateIndex = 0;				// array index for number of checks perfor
  * together into one byte to be used in the debouncing routine
  * 
  * The byte layout is as follows:
- * Bit	7			6		 5		  4		    3 		2 		1
- * BTN_RIGHT | BTN_LEFT | BTN_OE | BTN_MODE | ENC_B | ENC_A | ENC_BTN
+ * Bit	6		5		 4		  3		    2 		1 			0
+ * BTN_MODE | BTN_OE | ENC_B | ENC_A | ENC_BTN | BTN_RIGHT | BTN_LEFT
  */
 uint8_t getSwitchRaw(void)
 {
-	uint8_t pb,pd, tmp;
-	pb = (PINB & 0xC0);
-	pd = (PIND & 0x7C);
-	tmp = (pb | (pd>>1)) ^ 0xFF;	// invert read values because switches are active low
+	uint8_t tmp;
+	tmp = (PIND & 0x7F) ^ 0xFF;	// invert read values because switches are active low
 	return tmp;
 }
 
@@ -460,11 +458,10 @@ int main(void)
 	
 	// input switches
 	DDRB &= ~0xC0;
-	DDRD &= ~0x7C;
+	DDRD &= ~0x7F;
 		
 	// enable pull up resistors
-	PORTB |= 0xC0;
-	PORTD |= 0x7C;
+	PORTD |= 0x7F;
 
 	voltageSet = 500;
 	currentSet = 3000;
