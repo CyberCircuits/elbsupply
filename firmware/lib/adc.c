@@ -3,7 +3,7 @@
 
 void ADC_init(void)
 {
-	ADMUX |= 0xC0;		// ADC uses the internal 2.56V band gap reference
+	ADMUX |= 0x00;		// ADC uses the internal 2.5V band gap reference from AREF
 	ADCSRA = 0x87;		// 125kHz conversion clock (F_CPU/128), ADC enabled
 }
 
@@ -25,9 +25,11 @@ uint16_t ADC_readRaw(uint8_t channel)
  */
 uint16_t ADC_readPSUOutV(void)
 {
-	uint16_t temp;
+	uint32_t temp;
 	temp = ADC_readRaw(6);	// read from ADC channel 6 
-	temp = temp<<1;			// multiply output by 2 
+	temp *= 1500;
+	temp = temp>>10;
+	//temp = (uint16_t)((float)temp*voltageConstant);			
 	return temp;
 }
 

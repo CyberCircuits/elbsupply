@@ -260,19 +260,19 @@ SM_STATE stateEncInc(void)
 	// increase output voltage or current depending on cursor position
 	switch (displayCurpos){
 	case 0:
-		if (voltageSet < 1001) voltageSet += 1000;
+		if (voltageSet < 501) voltageSet += 1000;
 		break;
 					
 	case 1:
-		if (voltageSet < 1901) voltageSet += 100;
+		if (voltageSet < 1401) voltageSet += 100;
 		break;
 						
 	case 3:
-		if (voltageSet < 1991) voltageSet += 10;
+		if (voltageSet < 1491) voltageSet += 10;
 		break;
 						
 	case 4:
-		if (voltageSet < 2000) voltageSet += 1;
+		if (voltageSet < 1500) voltageSet += 1;
 		break;
 						
 	case 7:

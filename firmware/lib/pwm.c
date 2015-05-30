@@ -4,7 +4,7 @@
 void PWM_init(void)
 {	
 	// configure Timer 1
-	ICR1 = 19999;	// uper limit of Timer 1 count, yields resolution of 1 mV
+	ICR1 = 14999;	// uper limit of Timer 1 count, yields resolution of 1 mV
 	OCR1A = 0;
 	OCR1B = 0;
 	TCCR1A = 0xA2; // fast non-inverting PWM mode
